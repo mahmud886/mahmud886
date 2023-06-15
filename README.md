@@ -6,16 +6,19 @@ I am a web developer who is proficient in both front-end and
 back-end development. My passion lies in learning about the
 latest technologies
 
-Expertise: Html5 | CSS3 | Html5 Banners | EDM | Email Templates |
+- Expertise: Html5 | CSS3 | Html5 Banners | EDM | Email Templates |
 Bootstrap | Tailwind CSS | Material-UI | JavaScript | ES6 | ReactJS |
 Typescript | MongoDB.
-Comfortable: NodeJS | ExpressJS | Redux | NextJS | Java | Python |
+
+- Comfortable: NodeJS | ExpressJS | Redux | NextJS | Java | Python |
 AWS | jQuery | PHP | Laravel | Data Structures & Algorithms | SEO |
 Shell-Script | Linux Commands | MySQL | WordPress.
-Familiar: Recharts | dc.js | React Native | Android App | Chrome
+
+- Familiar: Recharts | dc.js | React Native | Android App | Chrome
 extension | Photoshop | Premier Pro | After Effects | Adobe XD |
 Figma | Dreamweaver.
-Tools: Git | Firebase | Heroku | Netlify | Webpack | Chrome Dev
+
+- Tools: Git | Firebase | Heroku | Netlify | Webpack | Chrome Dev
 Tool | VS Code | Web Storm | JIRA.
 
 Typically I love to work with Reactjs.
