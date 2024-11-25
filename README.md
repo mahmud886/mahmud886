@@ -1,5 +1,5 @@
 # 💫 About Me:
-As a dedicated web developer with over 4 years of experience in both front-end and back-end development. I am passionate about continuous learning and staying up to date with the latest technologies. I have a talent for crafting efficient, well-designed, and notably DRY (Don't Repeat Yourself) code. This has resulted in a 20% increase in development efficiency and a 15% reduction in debugging time. 
+As a dedicated web developer with over 5+ years of experience in both front-end and back-end development. I am passionate about continuous learning and staying up to date with the latest technologies. I have a talent for crafting efficient, well-designed, and notably DRY (Don't Repeat Yourself) code. This has resulted in a 20% increase in development efficiency and a 15% reduction in debugging time. 
 
 
 ## 🌐 Socials:
