@@ -46,3 +46,6 @@ As a dedicated web developer with over 5+ years of experience in both front-end 
 [![](https://visitcount.itsvg.in/api?id=mahmud886&icon=6&color=12)](https://visitcount.itsvg.in)
 
 
+[![GitHub Streak](https://streak-stats.demolab.com?user=mahmud886&theme=github-dark)](https://git.io/streak-stats)
+
+
