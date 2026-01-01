@@ -15,7 +15,7 @@
 
 ### 💫 About Me:
 
-As a dedicated web developer with over **5+ years** of experience in both front-end and back-end development. I am passionate about continuous learning and staying up to date with the latest technologies. I have a talent for crafting efficient, well-designed, and notably **DRY (Don't Repeat Yourself)** code. This has resulted in a **20% increase in development efficiency** and a **15% reduction in debugging time**.
+As a dedicated Software Engineer with over **6+ years** of experience in both front-end and back-end development. I am passionate about continuous learning and staying up to date with the latest technologies. I have a talent for crafting efficient, well-designed, and notably **DRY (Don't Repeat Yourself)** code. This has resulted in a **20% increase in development efficiency** and a **15% reduction in debugging time**.
 
 </div>
 
@@ -135,23 +135,15 @@ As a dedicated web developer with over **5+ years** of experience in both front-
 
 ### 📊 GitHub Stats:
 
-<img
-  height='180em'
-  src='https://github-readme-stats.vercel.app/api?username=mahmud886&show_icons=true&theme=github_dark&include_all_commits=true&count_private=true'
-/>
-<img
-  height='180em'
-  src='https://github-readme-stats.vercel.app/api/top-langs/?username=mahmud886&layout=compact&langs_count=8&theme=github_dark'
-/>
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=mahmud886&show_icons=true&theme=github_dark&include_all_commits=true&count_private=true)
+
+![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=mahmud886&layout=compact&langs_count=8&theme=github_dark)
 
 ![GitHub Activity Graph](https://github-readme-activity-graph.vercel.app/graph?username=mahmud886&theme=github-dark&hide_border=true)
 
 ### 🏆 GitHub Trophies:
 
-<img
-  src='https://github-profile-trophy.vercel.app/?username=mahmud886&theme=onedark&no-frame=false&no-bg=false&margin-w=4'
-  alt='GitHub Trophies'
-/>
+![GitHub Trophies](https://github-profile-trophy.vercel.app/?username=mahmud886&theme=onedark&no-frame=false&no-bg=false&margin-w=4)
 
 </div>
 
@@ -169,9 +161,6 @@ As a dedicated web developer with over **5+ years** of experience in both front-
 
 <div align="center">
 
-<img
-  src='https://raw.githubusercontent.com/mahmud886/mahmud886/output/github-contribution-grid-snake.svg'
-  alt='Snake animation'
-/>
+![Snake animation](https://raw.githubusercontent.com/mahmud886/mahmud886/output/github-contribution-grid-snake.svg)
 
 </div>
