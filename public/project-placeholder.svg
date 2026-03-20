@@ -1,0 +1,26 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Project preview placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0f12"/>
+      <stop offset="1" stop-color="#141a1e"/>
+    </linearGradient>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#14cba8" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#22c55e" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <rect x="24" y="24" width="1152" height="627" rx="24" fill="none" stroke="url(#a)" stroke-width="2"/>
+  <g transform="translate(0,40)">
+    <circle cx="110" cy="70" r="6" fill="#2b3a43"/>
+    <circle cx="130" cy="70" r="6" fill="#2b3a43"/>
+    <circle cx="150" cy="70" r="6" fill="#2b3a43"/>
+    <rect x="190" y="58" width="220" height="24" rx="12" fill="#1f2a30"/>
+    <rect x="190" y="104" width="420" height="16" rx="8" fill="#1f2a30"/>
+    <rect x="190" y="130" width="360" height="16" rx="8" fill="#1f2a30"/>
+  </g>
+  <g transform="translate(0,220)">
+    <rect x="190" y="0" width="820" height="380" rx="16" fill="#0f171b" stroke="#1f2a30"/>
+    <text x="600" y="190" fill="#14cba8" font-family="sans-serif" font-weight="700" font-size="28" text-anchor="middle">Preview Image</text>
+  </g>
+</svg>
