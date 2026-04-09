@@ -164,3 +164,24 @@ As a dedicated Software Engineer with over **6+ years** of experience in both fr
 ![Snake animation](https://raw.githubusercontent.com/mahmud886/mahmud886/output/github-contribution-grid-snake.svg)
 
 </div>
+
+---
+
+## Contact Form Email Setup
+
+This project sends contact form submissions from `src/components/sections/ContactSection.tsx` to `src/app/api/contact/route.ts`.
+
+1. Copy env template and fill Resend values:
+
+```bash
+cp .env.example .env.local
+```
+
+2. Set these values in `.env.local`:
+
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL`
+- `CONTACT_TO_EMAIL`
+
+3. Restart the dev server after updating env vars.
+

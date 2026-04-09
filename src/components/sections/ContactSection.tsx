@@ -11,6 +11,7 @@ export default function ContactSection() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const sectionRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -53,18 +54,34 @@ export default function ContactSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setFormData({ name: '', email: '', message: '' });
+      const data = await res.json();
 
-    setTimeout(() => {
-      setIsSubmitted(false);
-    }, 5000);
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send message.');
+      }
+
+      setIsSubmitted(true);
+      setFormData({ name: '', email: '', message: '' });
+
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 5000);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to send message.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -82,7 +99,7 @@ export default function ContactSection() {
             Get In <span className='text-secondary'>Touch</span>
           </h2>
           <p className='text-text-muted text-lg max-w-2xl mx-auto'>
-            Have a project in mind or want to explore potential opportunities? I'm always open to discussing new
+            Have a project in mind or want to explore potential opportunities? I am always open to discussing new
             projects and creative ideas.
           </p>
         </div>
@@ -198,6 +215,8 @@ export default function ContactSection() {
                   </>
                 )}
               </button>
+
+              {submitError ? <p className='text-sm text-red-400'>{submitError}</p> : null}
             </div>
           </form>
         </div>

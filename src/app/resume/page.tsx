@@ -18,63 +18,72 @@ export default function ResumePage() {
       const element = resumeRef.current;
 
       const opt = {
-        margin: 10,
+        margin: [6, 0, 16, 0] as [number, number, number, number],
         filename: 'Iqbal_Mahmud_Resume.pdf',
-        image: { type: 'jpeg' as const, quality: 0.98 },
+        // Balanced preset: much smaller PDF with readable text.
+        image: { type: 'jpeg' as const, quality: 0.8 },
         html2canvas: {
-          scale: 2,
+          scale: 1.35,
           useCORS: true,
-          letterRendering: true,
+          letterRendering: false,
           logging: true,
           backgroundColor: '#ffffff',
           onclone: (clonedDoc: Document) => {
-            // Strip ALL tailwind color classes to prevent oklab parsing errors in html2canvas
-            // Force a clean black-and-white print view
-            const elements = clonedDoc.querySelectorAll('*');
-            elements.forEach((el) => {
-              const htmlEl = el as HTMLElement;
+            const mainContainer = clonedDoc.getElementById('resume-content-container');
+            if (!mainContainer) return;
 
-              // Ensure className is a string
-              if (typeof htmlEl.className === 'string') {
-                // Remove specific background/text color classes that use opacity/custom colors
-                let newClass = htmlEl.className;
-                const classesToRemove = [
-                  'bg-surface', 'bg-background', 'bg-background/40', 'bg-background/50',
-                  'bg-background/60', 'bg-background/80', 'bg-primary/70', 'bg-primary/10',
-                  'bg-secondary/60', 'text-text-main', 'text-text-muted', 'text-text-muted/80',
-                  'text-primary', 'border-surface-hover', 'border-primary/50',
-                  'bg-gradient-to-tr', 'from-primary/70', 'to-secondary/60',
-                  'shadow-xl', 'rounded-3xl', 'md:p-12', 'p-8' // Remove borders and huge padding
-                ];
-
-                classesToRemove.forEach(cls => {
-                  // Replace global instances of the exact class string
-                  newClass = newClass.split(' ').filter(c => c !== cls).join(' ');
-                });
-
-                htmlEl.className = newClass;
+            const styleEl = clonedDoc.createElement('style');
+            styleEl.textContent = `
+              #resume-content-container,
+              #resume-content-container * {
+                color: #000000 !important;
               }
 
-              // Override inline styles to force black on white
-              htmlEl.style.backgroundColor = 'transparent';
-              htmlEl.style.backgroundImage = 'none';
-              htmlEl.style.color = '#000000';
-              htmlEl.style.borderColor = '#e5e7eb'; // Light gray for borders instead of dark
-            });
+              #resume-content-container {
+                background: #ffffff !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+              }
 
-            // Specifically target the main container to ensure white background and proper spacing
-            const mainContainer = clonedDoc.getElementById('resume-content-container');
-            if (mainContainer) {
-              mainContainer.style.backgroundColor = '#ffffff';
-              mainContainer.style.boxShadow = 'none';
-              mainContainer.style.border = 'none';
-              mainContainer.style.padding = '10mm 10mm 10mm 10mm'; // Use exact millimeter padding
-              mainContainer.style.margin = '0';
-              mainContainer.style.borderRadius = '0';
-            }
+              #resume-content-container [class*="bg-"] {
+                background: transparent !important;
+                background-image: none !important;
+              }
+
+              #resume-content-container [class*="border"] {
+                border-color: #d1d5db !important;
+              }
+
+              #resume-content-container a {
+                color: #000000 !important;
+                text-decoration: none !important;
+              }
+
+              #resume-content-container .pdf-keep {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+              }
+
+              #resume-content-container h1,
+              #resume-content-container h2,
+              #resume-content-container h3,
+              #resume-content-container h4 {
+                break-after: avoid-page;
+                page-break-after: avoid;
+              }
+            `;
+            clonedDoc.head.appendChild(styleEl);
+
+            mainContainer.style.backgroundColor = '#ffffff';
+            mainContainer.style.color = '#000000';
+            mainContainer.style.setProperty('border', 'none', 'important');
+            mainContainer.style.setProperty('border-radius', '0', 'important');
+            mainContainer.style.setProperty('box-shadow', 'none', 'important');
+            mainContainer.style.setProperty('padding', '6mm 7mm', 'important');
           }
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: true }
       };
 
       // We no longer need to manually toggle classes here since onclone handles it
@@ -111,35 +120,35 @@ export default function ResumePage() {
           <div className='flex flex-col-reverse md:flex-row md:items-start justify-between gap-6'>
             <div>
               <h2 className='text-3xl font-extrabold text-text-main mb-2'>Iqbal Mahmud</h2>
-              <div className='text-lg text-primary font-medium mb-4'>Software Enginner</div>
+              <div className='text-lg text-primary font-medium mb-4'>Software Engineer</div>
 
-              <div className='flex flex-wrap gap-4 text-xs text-text-muted'>
-                <div className='flex items-center gap-1.5'>
-                  <MapPin size={14} /> Dhaka, Bangladesh
+              <div className='flex flex-wrap gap-4 text-xs text-text-muted leading-none'>
+                <div className='inline-flex items-center gap-1.5 leading-none'>
+                  <MapPin className='h-3.5 w-3.5 shrink-0' /> Dhaka, Bangladesh
                 </div>
-                <div className='flex items-center gap-1.5'>
-                  <Mail size={14} /> iqbal886mahmud@gmail.com
+                <div className='inline-flex items-center gap-1.5 leading-none'>
+                  <Mail className='h-3.5 w-3.5 shrink-0' /> iqbal886mahmud@gmail.com
                 </div>
                 <a
                   href='https://github.com/mahmud886'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='flex items-center gap-1.5 hover:text-primary transition-colors'>
-                  <Github size={14} /> github.com/mahmud886
+                  className='inline-flex items-center gap-1.5 leading-none hover:text-primary transition-colors'>
+                  <Github className='h-3.5 w-3.5 shrink-0' /> github.com/mahmud886
                 </a>
                 <a
                   href='https://linkedin.com/in/mahmud886'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='flex items-center gap-1.5 hover:text-primary transition-colors'>
-                  <Linkedin size={14} /> linkedin.com/in/mahmud886
+                  className='inline-flex items-center gap-1.5 leading-none hover:text-primary transition-colors'>
+                  <Linkedin className='h-3.5 w-3.5 shrink-0' /> linkedin.com/in/mahmud886
                 </a>
                 <a
                   href='https://mahmud886.vercel.app'
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='flex items-center gap-1.5 hover:text-primary transition-colors'>
-                  <ExternalLink size={14} /> mahmud886.vercel.app
+                  className='inline-flex items-center gap-1.5 leading-none hover:text-primary transition-colors'>
+                  <ExternalLink className='h-3.5 w-3.5 shrink-0' /> mahmud886.vercel.app
                 </a>
               </div>
             </div>
@@ -165,7 +174,7 @@ export default function ResumePage() {
         <div className='mb-8'>
           <h3 className='text-sm font-bold tracking-widest text-text-main mb-3 uppercase'>Summary</h3>
           <p className='text-text-muted leading-relaxed text-[13px]'>
-            Software Engineer passionate about crafting high-performance web applications and seamless user experiences.
+            Software Engineer with 6+ years of experience, passionate about crafting high-performance web applications and seamless user experiences.
             Specializing in Next.js, React, and modern frontend ecosystems to build scalable, interactive, and
             beautifully animated interfaces. Experienced in taking complex concepts and turning them into elegant
             digital solutions.
@@ -175,54 +184,66 @@ export default function ResumePage() {
         {/* Skills */}
         <div className='mb-8'>
           <h3 className='text-sm font-bold tracking-widest text-text-main mb-4 uppercase'>Core Stack</h3>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div className='flex flex-col gap-5'>
             <div>
-              <div className='text-xs font-semibold text-text-main mb-1.5'>Frontend</div>
-              <div className='flex flex-wrap gap-1.5'>
-                {['React', 'Next.js', 'TypeScript', 'Tailwind', 'GSAP', 'Three.js'].map((s) => (
-                  <span
-                    key={s}
-                    className='bg-background/60 border border-surface-hover text-text-muted px-2 py-0.5 rounded text-[11px]'>
-                    {s}
-                  </span>
-                ))}
-              </div>
+              <div className='text-xs font-bold tracking-widest text-text-main mb-2 uppercase'>Frontend</div>
+              <p className='text-text-muted text-[12px] leading-relaxed'>
+                {[
+                  'HTML5',
+                  'CSS3',
+                  'HTML5 Animations',
+                  'EDM',
+                  'Email Templates',
+                  'Bootstrap',
+                  'Tailwind CSS',
+                  'Material-UI',
+                  'Styled-Components',
+                  'Chakra-UI',
+                  'JavaScript',
+                  'ReactJS',
+                  'NextJS',
+                  'TypeScript',
+                  'Zustand',
+                  'Redux Toolkit',
+                  'Recharts.js',
+                  'GSAP.js',
+                  'D3.js',
+                ].join(', ')}
+              </p>
             </div>
             <div>
-              <div className='text-xs font-semibold text-text-main mb-1.5'>Backend & API</div>
-              <div className='flex flex-wrap gap-1.5'>
-                {['Node.js', 'Express', 'PostgreSQL', 'Redis', 'REST', 'GraphQL'].map((s) => (
-                  <span
-                    key={s}
-                    className='bg-background/60 border border-surface-hover text-text-muted px-2 py-0.5 rounded text-[11px]'>
-                    {s}
-                  </span>
-                ))}
-              </div>
+              <div className='text-xs font-bold tracking-widest text-text-main mb-2 uppercase'>Backend</div>
+              <p className='text-text-muted text-[12px] leading-relaxed'>
+                {['NodeJS', 'ExpressJS', 'MongoDB', 'RESTful API', 'Supabase', 'PostgreSQL'].join(', ')}
+              </p>
             </div>
             <div>
-              <div className='text-xs font-semibold text-text-main mb-1.5'>DevOps & Cloud</div>
-              <div className='flex flex-wrap gap-1.5'>
-                {['Docker', 'CI/CD', 'Vercel', 'AWS'].map((s) => (
-                  <span
-                    key={s}
-                    className='bg-background/60 border border-surface-hover text-text-muted px-2 py-0.5 rounded text-[11px]'>
-                    {s}
-                  </span>
-                ))}
-              </div>
+              <div className='text-xs font-bold tracking-widest text-text-main mb-2 uppercase'>DevOps</div>
+              <p className='text-text-muted text-[12px] leading-relaxed'>
+                {['AWS', 'Firebase', 'Hostinger', 'Netlify', 'Vercel', 'Webpack', 'Shell Script', 'Linux Commands'].join(', ')}
+              </p>
             </div>
             <div>
-              <div className='text-xs font-semibold text-text-main mb-1.5'>Tools</div>
-              <div className='flex flex-wrap gap-1.5'>
-                {['Git', 'Storybook', 'Jest', 'Figma'].map((s) => (
-                  <span
-                    key={s}
-                    className='bg-background/60 border border-surface-hover text-text-muted px-2 py-0.5 rounded text-[11px]'>
-                    {s}
-                  </span>
-                ))}
-              </div>
+              <div className='text-xs font-bold tracking-widest text-text-main mb-2 uppercase'>Tools</div>
+              <p className='text-text-muted text-[12px] leading-relaxed'>
+                {[
+                  'Git',
+                  'Storybook',
+                  'Jest',
+                  'Figma',
+                  'JIRA',
+                  'ClickUp',
+                  'Slack',
+                  'VS Code',
+                  'WebStorm',
+                  'Adobe XD',
+                  'Photoshop',
+                  'Premiere Pro',
+                  'After Effects',
+                  'Dreamweaver',
+                  'Chrome DevTools',
+                ].join(', ')}
+              </p>
             </div>
           </div>
         </div>
@@ -231,7 +252,7 @@ export default function ResumePage() {
         <div className='mb-8'>
           <h3 className='text-sm font-bold tracking-widest text-text-main mb-4 uppercase'>Experience</h3>
           <div className='space-y-6'>
-            <div>
+            <div className='pdf-keep'>
               <div className='flex flex-wrap justify-between items-start mb-1'>
                 <div>
                   <h4 className='text-base font-bold text-text-main'>Software Engineer</h4>
@@ -254,7 +275,7 @@ export default function ResumePage() {
               </ul>
             </div>
 
-            <div>
+            <div className='pdf-keep'>
               <div className='flex flex-wrap justify-between items-start mb-1'>
                 <div>
                   <h4 className='text-base font-bold text-text-main'>Software Developer</h4>
@@ -282,7 +303,7 @@ export default function ResumePage() {
               </ul>
             </div>
 
-            <div>
+            <div className='pdf-keep'>
               <div className='flex flex-wrap justify-between items-start mb-1'>
                 <div>
                   <h4 className='text-base font-bold text-text-main'>Web Developer</h4>
@@ -311,7 +332,7 @@ export default function ResumePage() {
               </ul>
             </div>
 
-            <div>
+            <div className='pdf-keep'>
               <div className='flex flex-wrap justify-between items-start mb-1'>
                 <div>
                   <h4 className='text-base font-bold text-text-main'>Web Developer</h4>
@@ -333,7 +354,7 @@ export default function ResumePage() {
               </ul>
             </div>
 
-            <div>
+            <div className='pdf-keep'>
               <div className='flex flex-wrap justify-between items-start mb-1'>
                 <div>
                   <h4 className='text-base font-bold text-text-main'>Web Developer</h4>
@@ -357,7 +378,7 @@ export default function ResumePage() {
         <div className='mb-8'>
           <h3 className='text-sm font-bold tracking-widest text-text-main mb-4 uppercase'>Selected Projects</h3>
           <div className='space-y-6'>
-            <div>
+            <div className='pdf-keep'>
               <div className='flex items-center gap-2 mb-1'>
                 <h4 className='text-base font-bold text-text-main'>Dev Visualize</h4>
                 <a
@@ -381,7 +402,7 @@ export default function ResumePage() {
               </div>
             </div>
 
-            <div>
+            <div className='pdf-keep'>
               <div className='flex items-center gap-2 mb-1'>
                 <h4 className='text-base font-bold text-text-main'>Sporefall</h4>
                 <a
@@ -406,7 +427,7 @@ export default function ResumePage() {
               </div>
             </div>
 
-            <div>
+            <div className='pdf-keep'>
               <div className='flex items-center gap-2 mb-1'>
                 <h4 className='text-base font-bold text-text-main'>Loud Spectrum</h4>
                 <a

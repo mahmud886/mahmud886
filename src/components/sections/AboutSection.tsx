@@ -29,7 +29,7 @@ export default function AboutSection() {
     return () => ctx.revert();
   }, []);
 
-  const startYear = 2018;
+  const startYear = 2020;
   const years = Math.max(0, new Date().getFullYear() - startYear);
   const stats = [
     { v: `${years}+`, k: 'YEARS EXP.' },
@@ -59,7 +59,7 @@ export default function AboutSection() {
             </p>
             <div className='mt-6 flex flex-wrap gap-3'>
               <a
-                href='#contact'
+                href='mailto:iqbal886mahmud@gmail.com'
                 className='inline-flex items-center gap-2 rounded-xl border border-surface-hover bg-background px-4 py-2 text-sm font-bold hover:border-primary/50 transition-colors about-fade'>
                 <Mail size={16} /> Get in touch
               </a>
@@ -87,7 +87,7 @@ export default function AboutSection() {
                 <Linkedin size={18} />
               </a>
               <a
-                href='mailto:hello@example.com'
+                href='mailto:iqbal886mahmud@gmail.com'
                 aria-label='Email'
                 className='inline-flex items-center justify-center rounded-full border border-surface-hover bg-background p-2 text-text-muted hover:text-primary hover:border-primary/50 transition-colors'>
                 <Mail size={18} />
