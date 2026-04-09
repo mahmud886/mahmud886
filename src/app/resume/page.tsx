@@ -1,7 +1,8 @@
 'use client';
 
-import { Download, ExternalLink, Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import { ArrowLeft, Download, ExternalLink, Github, Linkedin, Mail, MapPin } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 
 export default function ResumePage() {
@@ -99,19 +100,27 @@ export default function ResumePage() {
 
   return (
     <div className='max-w-4xl mx-auto text-sm'>
-      <div className='mb-6 flex items-center justify-between'>
+      <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
         <h1 className='text-3xl font-bold'>Resume</h1>
-        <button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className='flex items-center gap-2 rounded-xl bg-primary text-black px-5 py-2.5 text-sm font-bold hover:bg-primary-dark transition-colors disabled:opacity-70 disabled:cursor-not-allowed'>
-          {isDownloading ? (
-            <div className='h-4 w-4 border-2 border-black/30 border-t-black rounded-full animate-spin' />
-          ) : (
-            <Download size={18} />
-          )}
-          {isDownloading ? 'Generating...' : 'Download PDF'}
-        </button>
+        <div className='flex flex-wrap items-center gap-3'>
+          <Link
+            href='/#home'
+            className='inline-flex items-center gap-2 rounded-xl border border-surface-hover bg-background px-5 py-2.5 text-sm font-bold text-text-main transition-colors hover:border-primary hover:text-primary'>
+            <ArrowLeft size={18} />
+            Return Home
+          </Link>
+          <button
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className='flex items-center gap-2 rounded-xl bg-primary text-black px-5 py-2.5 text-sm font-bold hover:bg-primary-dark transition-colors disabled:opacity-70 disabled:cursor-not-allowed'>
+            {isDownloading ? (
+              <div className='h-4 w-4 border-2 border-black/30 border-t-black rounded-full animate-spin' />
+            ) : (
+              <Download size={18} />
+            )}
+            {isDownloading ? 'Generating...' : 'Download PDF'}
+          </button>
+        </div>
       </div>
 
       <div id="resume-content-container" ref={resumeRef} className='rounded-3xl border border-surface-hover bg-surface p-8 md:p-12 shadow-xl'>
