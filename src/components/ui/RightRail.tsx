@@ -3,6 +3,7 @@
 import { cn } from '@/utils/cn';
 import { ArrowRight, Award, FileText, FolderGit2, Home, Mail, PlayCircle, User2 } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 type Item = {
@@ -27,12 +28,16 @@ const items: Item[] = [
 ];
 
 export default function RightRail() {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
   const [active, setActive] = useState<string>('home');
   const keys = useMemo(() => items.map((i) => i.key), []);
   const sectionsRef = useRef<Record<string, Element | null>>({});
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!isHome) return;
+
     const collect = () => {
       keys.forEach((k) => {
         sectionsRef.current[k] = document.getElementById(k);
@@ -81,9 +86,8 @@ export default function RightRail() {
           }
         });
         let nextId: string = active;
-        // Use any to avoid TS inference edge-case in build
-        const candidate: any = best;
-        if (candidate && typeof candidate.id === 'string') nextId = candidate.id as string;
+        const candidate = best as { id: string; dist: number } | null;
+        if (candidate) nextId = candidate.id;
         if (nextId && nextId !== active) setActive(nextId);
       });
     };
@@ -95,7 +99,7 @@ export default function RightRail() {
       window.removeEventListener('scroll', onScroll);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-  }, [keys]);
+  }, [active, isHome, keys]);
 
   const goNext = () => {
     const sections = keys
@@ -109,6 +113,8 @@ export default function RightRail() {
     setActive(next.k);
     next.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
+
+  if (!isHome) return null;
 
   return (
     <aside className='hidden md:flex fixed right-0 top-0 bottom-0 z-40 items-center pr-4'>

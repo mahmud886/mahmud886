@@ -61,6 +61,38 @@ export default function ResumePage() {
                 text-decoration: none !important;
               }
 
+              #resume-content-container .pdf-contact-row {
+                align-items: center !important;
+                line-height: 1 !important;
+              }
+
+              #resume-content-container .pdf-contact-row > * {
+                display: inline-flex !important;
+                align-items: center !important;
+                line-height: 1 !important;
+              }
+
+              #resume-content-container .pdf-contact-icon {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                line-height: 0 !important;
+                vertical-align: middle !important;
+                flex: 0 0 auto !important;
+              }
+
+              #resume-content-container .pdf-contact-icon svg {
+                display: block !important;
+                width: 0.75rem !important;
+                height: 0.75rem !important;
+              }
+
+              #resume-content-container .pdf-contact-label {
+                display: inline-flex !important;
+                align-items: center !important;
+                line-height: 1 !important;
+              }
+
               #resume-content-container .pdf-keep {
                 break-inside: avoid !important;
                 page-break-inside: avoid !important;
@@ -131,33 +163,48 @@ export default function ResumePage() {
               <h2 className='text-3xl font-extrabold text-text-main mb-2'>Iqbal Mahmud</h2>
               <div className='text-lg text-primary font-medium mb-4'>Software Engineer</div>
 
-              <div className='flex flex-wrap gap-4 text-xs text-text-muted leading-none'>
+              <div className='pdf-contact-row flex flex-wrap gap-4 text-xs text-text-muted leading-none'>
                 <div className='inline-flex items-center gap-1.5 leading-none'>
-                  <MapPin className='h-3.5 w-3.5 shrink-0' /> Dhaka, Bangladesh
+                  <span className='pdf-contact-icon flex h-3.5 w-3.5 shrink-0 items-center justify-center'>
+                    <MapPin className='h-3 w-3' />
+                  </span>
+                  <span className='pdf-contact-label'>Dhaka, Bangladesh</span>
                 </div>
                 <div className='inline-flex items-center gap-1.5 leading-none'>
-                  <Mail className='h-3.5 w-3.5 shrink-0' /> iqbal886mahmud@gmail.com
+                  <span className='pdf-contact-icon flex h-3.5 w-3.5 shrink-0 items-center justify-center'>
+                    <Mail className='h-3 w-3' />
+                  </span>
+                  <span className='pdf-contact-label'>iqbal886mahmud@gmail.com</span>
                 </div>
                 <a
                   href='https://github.com/mahmud886'
                   target='_blank'
                   rel='noopener noreferrer'
                   className='inline-flex items-center gap-1.5 leading-none hover:text-primary transition-colors'>
-                  <Github className='h-3.5 w-3.5 shrink-0' /> github.com/mahmud886
+                  <span className='pdf-contact-icon flex h-3.5 w-3.5 shrink-0 items-center justify-center'>
+                    <Github className='h-3 w-3' />
+                  </span>
+                  <span className='pdf-contact-label'>github.com/mahmud886</span>
                 </a>
                 <a
                   href='https://linkedin.com/in/mahmud886'
                   target='_blank'
                   rel='noopener noreferrer'
                   className='inline-flex items-center gap-1.5 leading-none hover:text-primary transition-colors'>
-                  <Linkedin className='h-3.5 w-3.5 shrink-0' /> linkedin.com/in/mahmud886
+                  <span className='pdf-contact-icon flex h-3.5 w-3.5 shrink-0 items-center justify-center'>
+                    <Linkedin className='h-3 w-3' />
+                  </span>
+                  <span className='pdf-contact-label'>linkedin.com/in/mahmud886</span>
                 </a>
                 <a
                   href='https://mahmud886.vercel.app'
                   target='_blank'
                   rel='noopener noreferrer'
                   className='inline-flex items-center gap-1.5 leading-none hover:text-primary transition-colors'>
-                  <ExternalLink className='h-3.5 w-3.5 shrink-0' /> mahmud886.vercel.app
+                  <span className='pdf-contact-icon flex h-3.5 w-3.5 shrink-0 items-center justify-center'>
+                    <ExternalLink className='h-3 w-3' />
+                  </span>
+                  <span className='pdf-contact-label'>mahmud886.vercel.app</span>
                 </a>
               </div>
             </div>
