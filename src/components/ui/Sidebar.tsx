@@ -29,6 +29,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import ThemeToggle from './ThemeToggle';
 
 type NavItem = {
   label: string;
@@ -58,12 +59,12 @@ function SkillRing({ label, value }: Skill) {
     <div className='flex flex-col items-center gap-2'>
       <div className='relative h-14 w-14'>
         <svg viewBox='0 0 52 52' className='h-14 w-14 -rotate-90'>
-          <circle cx='26' cy='26' r={radius} stroke='rgba(148,163,184,0.18)' strokeWidth='4' fill='none' />
+          <circle cx='26' cy='26' r={radius} stroke='var(--color-surface-hover)' strokeWidth='4' fill='none' />
           <circle
             cx='26'
             cy='26'
             r={radius}
-            stroke='rgb(20 203 168)'
+            stroke='var(--color-primary)'
             strokeWidth='4'
             strokeLinecap='round'
             fill='none'
@@ -125,12 +126,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       residence: 'Bangladesh',
       city: 'Dhaka',
       age: '30',
-      cvHref: '/cv.pdf',
     }),
     [],
   );
 
-  const pfCandidates = ['/assets/image/profile-image.jpg'];
+  const pfCandidates = ['/assets/images/profile-image.jpg', '/project-placeholder.svg'];
   const [pfIdx, setPfIdx] = useState(0);
   const pfSrc = pfCandidates[pfIdx] ?? '/project-placeholder.svg';
   const frontend = ['React', 'Next.js', 'TypeScript', 'Tailwind', 'GSAP'];
@@ -140,7 +140,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className='flex h-full flex-col'>
-      <div className='relative overflow-hidden rounded-3xl border border-surface-hover bg-surface px-6 pb-6 pt-8 h-full flex flex-col'>
+      <div className='custom-scrollbar relative overflow-y-auto overflow-x-hidden rounded-3xl border border-surface-hover bg-surface px-6 pb-6 pt-8 h-full flex flex-col'>
         <div className='pointer-events-none absolute -top-20 -right-16 h-56 w-56 rounded-full bg-primary/12 blur-3xl' />
         <div className='pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-secondary/10 blur-3xl' />
 
@@ -148,7 +148,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           <div className='h-[96px] w-[96px] rounded-full bg-gradient-to-tr from-primary/70 to-secondary/60 p-[2px]'>
             <div className='relative h-full w-full rounded-full bg-background/80 overflow-hidden'>
               <Image
-                src='/assets/images/profile-image.jpg'
+                src={pfSrc}
                 alt='Profile photo'
                 fill
                 className='object-cover'
@@ -216,6 +216,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               aria-label='Email'>
               <Mail size={18} />
             </a>
+            <ThemeToggle className='hover:text-primary transition-colors' />
           </div>
         </div>
       </div>
@@ -272,7 +273,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className='md:hidden fixed top-0 left-0 right-0 z-50 border-b border-surface-hover bg-surface/80 backdrop-blur-xl'>
+      <div className='lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-surface-hover bg-surface/80 backdrop-blur-xl'>
         <div className='mx-auto max-w-[1200px] px-4 sm:px-6 py-4 flex items-center justify-between'>
           <Link href='/' className='font-bold tracking-tight'>
             <span className='text-secondary'>I</span>qbal.
@@ -286,13 +287,13 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <aside className='hidden md:block fixed left-0 top-0 h-screen w-[340px] p-6'>
+      <aside className='hidden lg:block fixed left-0 top-0 h-screen w-[340px] p-6'>
         <SidebarContent />
       </aside>
 
       {open && (
         <div
-          className='md:hidden fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm'
+          className='lg:hidden fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm'
           onClick={() => setOpen(false)}>
           <div className='absolute inset-y-0 left-0 w-[86%] max-w-[360px] p-4' onClick={(e) => e.stopPropagation()}>
             <div className='rounded-3xl border border-surface-hover bg-background shadow-2xl h-full p-4'>

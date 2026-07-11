@@ -146,11 +146,11 @@ function RunningCard({ item, onOpen }: { item: Running; onOpen: () => void }) {
           sizes='(max-width: 768px) 100vw, 800px'
         />
       </div>
-      <div className='flex items-center justify-between'>
+      <div className='flex flex-wrap items-center justify-between gap-2'>
         <div className='text-xl font-bold flex items-center gap-2'>
           <PlayCircle className='text-primary' size={18} /> {item.name}
         </div>
-        <div className='text-xs rounded-full px-2.5 py-1 border border-surface-hover bg-background/60'>
+        <div className='shrink-0 text-xs rounded-full px-2.5 py-1 border border-surface-hover bg-background/60'>
           {item.status} · Since {item.since}
         </div>
       </div>

@@ -5,6 +5,8 @@ import Parser from 'rss-parser';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import parse from 'html-react-parser';
+import { cache } from 'react';
+import type { Metadata } from 'next';
 
 const window = new JSDOM('').window;
 const purify = DOMPurify(window as any);
@@ -15,7 +17,7 @@ const parser = new Parser({
   },
 });
 
-async function getArticle(slug: string) {
+const getArticle = cache(async (slug: string) => {
   try {
     const feed = await parser.parseURL('https://medium.com/feed/@mahmud886');
     
@@ -44,9 +46,44 @@ async function getArticle(slug: string) {
     console.error('Error fetching article:', error);
     return null;
   }
+});
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticle(slug);
+
+  if (!article) {
+    return { title: 'Article Not Found | Iqbal Mahmud' };
+  }
+
+  const description = article.content
+    ?.replace(/<[^>]*>?/gm, '')
+    .trim()
+    .slice(0, 160);
+
+  return {
+    title: `${article.title} | Iqbal Mahmud`,
+    description,
+    openGraph: {
+      title: article.title,
+      description,
+      type: 'article',
+      publishedTime: article.pubDate,
+      authors: article.author ? [article.author] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description,
+    },
+  };
 }
 
-export default async function BlogDetails({ params }: { params: { slug: string } }) {
+export default async function BlogDetails({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const article = await getArticle(resolvedParams.slug);
 
@@ -96,7 +133,7 @@ export default async function BlogDetails({ params }: { params: { slug: string }
         </header>
 
         {/* Article Content */}
-        <div className="prose prose-invert prose-lg max-w-none prose-img:rounded-xl prose-a:text-primary hover:prose-a:text-secondary prose-headings:text-text-main text-text-muted">
+        <div className="prose prose-lg max-w-none prose-img:rounded-xl prose-a:text-primary hover:prose-a:text-secondary">
           {parse(cleanContent)}
         </div>
 

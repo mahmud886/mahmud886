@@ -5,6 +5,7 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import parse from 'html-react-parser';
+import type { Metadata } from 'next';
 
 // Setup DOMPurify for Node.js environment
 const window = new JSDOM('').window;
@@ -48,7 +49,37 @@ async function getReadme(slug: string, defaultBranch: string) {
   }
 }
 
-export default async function ProjectDetails({ params }: { params: { slug: string } }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = await getProjectData(slug);
+
+  if (!project) {
+    return { title: 'Project Not Found | Iqbal Mahmud' };
+  }
+
+  const description = project.description || `${project.name} — a project by Iqbal Mahmud.`;
+
+  return {
+    title: `${project.name} | Iqbal Mahmud`,
+    description,
+    openGraph: {
+      title: project.name,
+      description,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: project.name,
+      description,
+    },
+  };
+}
+
+export default async function ProjectDetails({ params }: { params: Promise<{ slug: string }> }) {
   // Await the params object according to Next.js 15 requirements
   const resolvedParams = await params;
   const project = await getProjectData(resolvedParams.slug);
@@ -131,7 +162,7 @@ export default async function ProjectDetails({ params }: { params: { slug: strin
       <div className="px-6 md:px-10 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Main Content (README) */}
-          <div className="lg:col-span-2 prose prose-invert prose-lg max-w-none">
+          <div className="lg:col-span-2 prose prose-lg max-w-none">
             <h2 className="text-2xl font-bold mb-6 pb-2 border-b border-surface-hover">Overview</h2>
             <div className="readme-content bg-surface p-8 rounded-2xl border border-surface-hover">
               {parse(htmlContent)}

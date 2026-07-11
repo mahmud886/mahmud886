@@ -21,7 +21,7 @@ export async function GET(request: Request) {
       const thumbnail = imgMatch ? imgMatch[1] : null;
 
       // Extract excerpt from content
-      const excerpt = item['contentSnippet']?.substring(0, 150) + '...' || '';
+      const excerpt = item['contentSnippet'] ? `${item['contentSnippet'].substring(0, 150)}...` : '';
 
       // Extract slug from link
       const url = new URL(item.link);

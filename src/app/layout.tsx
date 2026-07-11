@@ -71,23 +71,34 @@ export const metadata: Metadata = {
   },
 };
 
+const themeInitScript = `
+(function () {
+  try {
+    var stored = localStorage.getItem('theme');
+    var theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' className='scroll-smooth'>
+    <html lang='en' className='scroll-smooth' suppressHydrationWarning>
       <head>
         <link rel='canonical' href='https://mahmud886.vercel.app' />
         <meta name='theme-color' content='#0b0f12' />
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className={`${inter.variable} antialiased bg-background text-foreground min-h-screen flex flex-col`}>
+      <body className={`${inter.variable} antialiased bg-background text-text-main min-h-screen flex flex-col`}>
         <CustomCursor />
         <ScrollGuard />
         <Sidebar />
         <RightRail />
-        <main className='flex-grow md:pl-[340px] md:pr-[84px] pt-[72px] md:pt-0'>
+        <main className='flex-grow lg:pl-[340px] lg:pr-[84px] pt-[72px] lg:pt-0'>
           <div className='mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-6 py-6'>{children}</div>
         </main>
       </body>

@@ -105,7 +105,7 @@ export default function BlogModal({ slug, open, onClose }: { slug: string | null
                   <span>{article.readingTime}</span>
                 </div>
               </div>
-              <div className='prose prose-invert max-w-none'>
+              <div className='prose max-w-none'>
                 {parse(article.content)}
               </div>
             </div>

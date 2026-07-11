@@ -8,10 +8,30 @@ import { PenTool, Code2, Rocket, Megaphone } from 'lucide-react';
 gsap.registerPlugin(ScrollTrigger);
 
 const services = [
-  { no: '01', title: 'UI/UX Design', icon: PenTool, desc: 'I design products that are more than pretty. I make them shippable.' },
-  { no: '02', title: 'Web Development', icon: Code2, desc: 'I design products that are more than pretty. I make them shippable.' },
-  { no: '03', title: 'SEO / Marketing', icon: Rocket, desc: 'I design products that are more than pretty. I make them shippable.' },
-  { no: '04', title: 'Branding & Strategy', icon: Megaphone, desc: 'I design products that are more than pretty. I make them shippable.' },
+  {
+    no: '01',
+    title: 'UI/UX Design',
+    icon: PenTool,
+    desc: 'Wireframes to polished, animated interfaces that feel intuitive and stay consistent across breakpoints.',
+  },
+  {
+    no: '02',
+    title: 'Web Development',
+    icon: Code2,
+    desc: 'Production-grade Next.js and React apps built for performance, type-safety, and long-term maintainability.',
+  },
+  {
+    no: '03',
+    title: 'SEO / Marketing',
+    icon: Rocket,
+    desc: 'Technical SEO, metadata, and Core Web Vitals tuning so the product actually gets found and loads fast.',
+  },
+  {
+    no: '04',
+    title: 'Branding & Strategy',
+    icon: Megaphone,
+    desc: 'Positioning and visual direction that ties product decisions back to a clear, consistent brand voice.',
+  },
 ];
 
 export default function ServicesSection() {

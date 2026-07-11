@@ -3,6 +3,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, Briefcase, FileText, Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -126,47 +127,47 @@ export default function AboutSection() {
               href='https://github.com/mahmud886'
               target='_blank'
               rel='noopener noreferrer'
-              className='flex items-center justify-between rounded-2xl p-3 hover:bg-background/60 transition-colors border border-surface-hover bg-background/40 flex-1 min-w-[240px]'>
-              <div className='flex items-center gap-3'>
-                <div className='h-10 w-10 rounded-full border border-surface-hover bg-background/60 flex items-center justify-center text-text-muted'>
+              className='flex items-center justify-between rounded-2xl p-3 hover:bg-background/60 transition-colors border border-surface-hover bg-background/40 flex-1 min-w-[200px] sm:min-w-[240px]'>
+              <div className='flex items-center gap-3 min-w-0'>
+                <div className='h-10 w-10 shrink-0 rounded-full border border-surface-hover bg-background/60 flex items-center justify-center text-text-muted'>
                   <Github size={18} />
                 </div>
-                <div>
+                <div className='min-w-0'>
                   <div className='font-semibold'>GitHub</div>
-                  <div className='text-sm text-text-muted'>@mahmud886</div>
+                  <div className='text-sm text-text-muted truncate'>@mahmud886</div>
                 </div>
               </div>
-              <ArrowUpRight className='text-text-muted' size={16} />
+              <ArrowUpRight className='text-text-muted shrink-0' size={16} />
             </a>
             <a
               href='https://linkedin.com/in/mahmud886'
               target='_blank'
               rel='noopener noreferrer'
-              className='flex items-center justify-between rounded-2xl p-3 hover:bg-background/60 transition-colors border border-surface-hover bg-background/40 flex-1 min-w-[240px]'>
-              <div className='flex items-center gap-3'>
-                <div className='h-10 w-10 rounded-full border border-surface-hover bg-background/60 flex items-center justify-center text-text-muted'>
+              className='flex items-center justify-between rounded-2xl p-3 hover:bg-background/60 transition-colors border border-surface-hover bg-background/40 flex-1 min-w-[200px] sm:min-w-[240px]'>
+              <div className='flex items-center gap-3 min-w-0'>
+                <div className='h-10 w-10 shrink-0 rounded-full border border-surface-hover bg-background/60 flex items-center justify-center text-text-muted'>
                   <Linkedin size={18} />
                 </div>
-                <div>
+                <div className='min-w-0'>
                   <div className='font-semibold'>LinkedIn</div>
-                  <div className='text-sm text-text-muted'>in/mahmud886</div>
+                  <div className='text-sm text-text-muted truncate'>in/mahmud886</div>
                 </div>
               </div>
-              <ArrowUpRight className='text-text-muted' size={16} />
+              <ArrowUpRight className='text-text-muted shrink-0' size={16} />
             </a>
             <a
               href='mailto:iqbal886mahmud@gmail.com'
-              className='flex items-center justify-between rounded-2xl p-3 hover:bg-background/60 transition-colors border border-surface-hover bg-background/40 flex-1 min-w-[240px]'>
-              <div className='flex items-center gap-3'>
-                <div className='h-10 w-10 rounded-full border border-surface-hover bg-background/60 flex items-center justify-center text-text-muted'>
+              className='flex items-center justify-between rounded-2xl p-3 hover:bg-background/60 transition-colors border border-surface-hover bg-background/40 flex-1 min-w-[200px] sm:min-w-[240px]'>
+              <div className='flex items-center gap-3 min-w-0'>
+                <div className='h-10 w-10 shrink-0 rounded-full border border-surface-hover bg-background/60 flex items-center justify-center text-text-muted'>
                   <Mail size={18} />
                 </div>
-                <div>
+                <div className='min-w-0'>
                   <div className='font-semibold'>Email</div>
-                  <div className='text-sm text-text-muted'>iqbal886mahmud@gmail.com</div>
+                  <div className='text-sm text-text-muted truncate'>iqbal886mahmud@gmail.com</div>
                 </div>
               </div>
-              <ArrowUpRight className='text-text-muted' size={16} />
+              <ArrowUpRight className='text-text-muted shrink-0' size={16} />
             </a>
           </div>
         </div>
@@ -180,11 +181,13 @@ function AboutPhoto() {
   const [idx, setIdx] = useState(0);
   const src = candidates[idx] ?? '/project-placeholder.svg';
   return (
-    <div className='relative h-[340px] w-full'>
-      <img
+    <div className='relative h-[260px] sm:h-[300px] lg:h-[340px] w-full'>
+      <Image
         src={src}
         alt='Profile'
-        className='h-full w-full object-cover'
+        fill
+        className='object-cover'
+        sizes='(max-width: 1024px) 100vw, 600px'
         onError={() => setIdx((i) => Math.min(i + 1, candidates.length - 1))}
       />
     </div>

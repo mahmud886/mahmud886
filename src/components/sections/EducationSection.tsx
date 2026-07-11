@@ -74,7 +74,7 @@ export default function EducationSection() {
           {items.map((it) => (
             <div
               key={it.school}
-              className='edu-item flex items-center justify-between gap-4 rounded-2xl border border-surface-hover bg-background/40 px-5 py-5'>
+              className='edu-item flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-surface-hover bg-background/40 px-5 py-5'>
               <div className='flex items-start gap-4'>
                 <div className='mt-1 h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center'>
                   <GraduationCap size={20} />

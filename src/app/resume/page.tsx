@@ -27,7 +27,7 @@ export default function ResumePage() {
           scale: 1.35,
           useCORS: true,
           letterRendering: false,
-          logging: true,
+          logging: false,
           backgroundColor: '#ffffff',
           onclone: (clonedDoc: Document) => {
             const mainContainer = clonedDoc.getElementById('resume-content-container');
@@ -93,11 +93,6 @@ export default function ResumePage() {
                 line-height: 1 !important;
               }
 
-              #resume-content-container .pdf-keep {
-                break-inside: avoid !important;
-                page-break-inside: avoid !important;
-              }
-
               #resume-content-container h1,
               #resume-content-container h2,
               #resume-content-container h3,
@@ -116,7 +111,8 @@ export default function ResumePage() {
             mainContainer.style.setProperty('padding', '6mm 7mm', 'important');
           }
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: true }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const, compress: true },
+        pagebreak: { mode: ['css', 'legacy'] as const, avoid: '.pdf-keep' },
       };
 
       // We no longer need to manually toggle classes here since onclone handles it
@@ -513,18 +509,18 @@ export default function ResumePage() {
           <div>
             <h3 className='text-sm font-bold tracking-widest text-text-main mb-4 uppercase'>Education</h3>
             <div className='space-y-4'>
-              <div>
+              <div className='pdf-keep'>
                 <h4 className='text-base font-bold text-text-main'>Computer Science</h4>
                 <div className='text-primary text-xs font-medium'>Southeast University (BD)</div>
                 <div className='text-xs text-text-muted mt-0.5'>2016 — 2020</div>
                 <div className='text-xs text-text-muted mt-0.5'>Grade: 3.02</div>
               </div>
-              <div>
+              <div className='pdf-keep'>
                 <h4 className='text-base font-bold text-text-main'>Higher Secondary School Certificate, Science</h4>
                 <div className='text-primary text-xs font-medium'>Mymensingh Ideal College</div>
                 <div className='text-xs text-text-muted mt-0.5'>Jul 2013 — Jul 2015</div>
               </div>
-              <div>
+              <div className='pdf-keep'>
                 <h4 className='text-base font-bold text-text-main'>Secondary School Certificate, Science</h4>
                 <div className='text-primary text-xs font-medium'>B.M High School</div>
                 <div className='text-xs text-text-muted mt-0.5'>Jan 2007 — May 2013</div>
@@ -535,13 +531,13 @@ export default function ResumePage() {
           <div>
             <h3 className='text-sm font-bold tracking-widest text-text-main mb-4 uppercase'>Certifications</h3>
             <div className='space-y-4'>
-              <div>
+              <div className='pdf-keep'>
                 <h4 className='text-base font-bold text-text-main'>Reactive Accelerator - Batch 1 LWS</h4>
                 <div className='text-primary text-xs font-medium'>Learn with Sumit (LWS)</div>
                 <div className='text-xs text-text-muted mt-0.5'>Issued Jan 2024</div>
                 <div className='text-xs text-text-muted mt-0.5'>Credential ID: LWSCTXN-UZELD7KP</div>
               </div>
-              <div>
+              <div className='pdf-keep'>
                 <h4 className='text-base font-bold text-text-main'>Complete Web Development With Programming Hero</h4>
                 <div className='text-primary text-xs font-medium'>Programming Hero</div>
                 <div className='text-xs text-text-muted mt-0.5'>Issued Jan 2020</div>

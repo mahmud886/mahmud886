@@ -115,7 +115,7 @@ export default function ProjectModal({ repo, isOpen, onClose }: ProjectModalProp
         onClick={(e) => e.stopPropagation()} // Prevent clicks inside from closing
       >
         {/* Top bar (Live only if available) */}
-        <div className='flex-shrink-0 px-4 py-3 md:px-6 md:py-4 border-b border-surface-hover flex items-center justify-between bg-surface/50 backdrop-blur-xl z-10 relative'>
+        <div className='flex-shrink-0 px-4 py-3 md:px-6 md:py-4 border-b border-surface-hover flex flex-wrap items-center justify-between gap-3 bg-surface/50 backdrop-blur-xl z-10 relative'>
           <div className='flex items-center gap-2 text-xs'>
             {repo.homepage ? (
               <button
@@ -125,23 +125,26 @@ export default function ProjectModal({ repo, isOpen, onClose }: ProjectModalProp
               </button>
             ) : null}
           </div>
-          {repo.homepage ? (
-            <a
-              href={repo.homepage}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='inline-flex items-center gap-2 rounded-full border border-surface-hover bg-background/60 px-3 py-1.5 text-xs font-medium hover:border-primary/50 transition-colors'>
-              Open in New Tab <ExternalLink size={14} />
-            </a>
-          ) : (
-            <div className='text-xs text-text-muted'>No live demo</div>
-          )}
-          <button
-            onClick={handleClose}
-            className='p-2 rounded-full hover:bg-background transition-colors text-text-muted hover:text-text-main z-10'
-            aria-label='Close modal'>
-            <X size={24} />
-          </button>
+          <div className='flex items-center gap-2 shrink-0'>
+            {repo.homepage ? (
+              <a
+                href={repo.homepage}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='inline-flex items-center gap-2 rounded-full border border-surface-hover bg-background/60 px-3 py-1.5 text-xs font-medium hover:border-primary/50 transition-colors'>
+                <span className='hidden sm:inline'>Open in New Tab</span>
+                <ExternalLink size={14} />
+              </a>
+            ) : (
+              <div className='text-xs text-text-muted'>No live demo</div>
+            )}
+            <button
+              onClick={handleClose}
+              className='p-2 rounded-full hover:bg-background transition-colors text-text-muted hover:text-text-main z-10'
+              aria-label='Close modal'>
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Media area */}
@@ -196,7 +199,7 @@ export default function ProjectModal({ repo, isOpen, onClose }: ProjectModalProp
                   </div>
                 ) : (
                   <div
-                    className='prose prose-invert prose-sm md:prose-base max-w-none'
+                    className='prose prose-sm md:prose-base max-w-none'
                     dangerouslySetInnerHTML={{ __html: readme }}
                   />
                 )}

@@ -31,7 +31,7 @@ export default function HeroSection() {
   return (
     <section
       id='home'
-      className='relative w-full overflow-hidden rounded-3xl border border-surface-hover bg-surface min-h-[560px] h-[70vh] flex items-center'>
+      className='relative w-full overflow-hidden rounded-3xl border border-surface-hover bg-surface min-h-[420px] py-16 sm:py-20 md:py-24 flex items-center'>
       {/* 3D Background */}
       <HeroScene />
 
@@ -47,37 +47,37 @@ export default function HeroSection() {
         </div>
         <div className='grid grid-cols-1 md:grid-cols-1 gap-6 md:gap-12 items-center'>
           <div className='pointer-events-auto text-center'>
-            <h1 ref={titleRef} className='text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4'>
+            <h1 ref={titleRef} className='text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4'>
               I Build <span className='text-primary'>Scalable</span> Digital Experiences
             </h1>
 
             <p
               ref={subtitleRef}
-              className='text-base md:text-lg text-text-muted max-w-xl md:max-w-2xl mb-6 font-medium mx-auto text-center leading-relaxed'>
+              className='text-sm sm:text-base md:text-lg text-text-muted max-w-xl md:max-w-2xl mb-6 font-medium mx-auto text-center leading-relaxed'>
               I’m a Software Engineer passionate about crafting high-performance web applications and seamless user
               experiences. I specialize in turning complex ideas into elegant, efficient, and scalable solutions.
             </p>
-            <div className='flex flex-wrap items-center justify-center gap-6 mb-8 text-text-muted'>
+            <div className='flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-8 text-xs sm:text-sm text-text-muted'>
               <div className='flex items-center gap-2'>
-                <Check className='text-primary' size={18} />
+                <Check className='text-primary shrink-0' size={16} />
                 <span>Clean Architecture</span>
               </div>
               <div className='flex items-center gap-2'>
-                <Check className='text-primary' size={18} />
+                <Check className='text-primary shrink-0' size={16} />
                 <span>Performance-Driven Development</span>
               </div>
               <div className='flex items-center gap-2'>
-                <Check className='text-primary' size={18} />
+                <Check className='text-primary shrink-0' size={16} />
                 <span>Full-Stack Expertise</span>
               </div>
               <div className='basis-full' />
-              <div className='w-full flex items-center justify-center gap-6 mt-1'>
+              <div className='w-full flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-1'>
                 <div className='flex items-center gap-2'>
-                  <Check className='text-primary' size={18} />
+                  <Check className='text-primary shrink-0' size={16} />
                   <span>Available for Work</span>
                 </div>
                 <div className='flex items-center gap-2'>
-                  <Check className='text-primary' size={18} />
+                  <Check className='text-primary shrink-0' size={16} />
                   <span>Full-Time Job</span>
                 </div>
               </div>

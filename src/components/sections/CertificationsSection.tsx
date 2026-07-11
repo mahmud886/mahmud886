@@ -88,9 +88,9 @@ export default function CertificationsSection() {
               {c.credentialId && (
                 <div className="mt-2 text-sm text-text-muted">Credential ID: {c.credentialId}</div>
               )}
-              {(c.credentialUrl || c.note) && (
+              {((c.credentialUrl && c.credentialUrl !== '#') || c.note) && (
                 <div className="mt-4 flex flex-wrap items-center gap-4">
-                  {c.credentialUrl && (
+                  {c.credentialUrl && c.credentialUrl !== '#' && (
                     <a
                       href={c.credentialUrl}
                       target="_blank"

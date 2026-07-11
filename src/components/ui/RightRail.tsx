@@ -102,22 +102,18 @@ export default function RightRail() {
   }, [active, isHome, keys]);
 
   const goNext = () => {
-    const sections = keys
-      .map((k) => ({ k, el: document.getElementById(k) as HTMLElement | null }))
-      .filter((x): x is { k: string; el: HTMLElement } => !!x.el)
-      .map(({ k, el }) => ({ k, el, top: el.getBoundingClientRect().top + (window.scrollY || window.pageYOffset) }));
-    if (sections.length === 0) return;
-    const scrollY = window.scrollY || document.documentElement.scrollTop || window.pageYOffset || 0;
-    const epsilon = 8; // small forward step
-    const next = sections.filter((s) => s.top > scrollY + epsilon).sort((a, b) => a.top - b.top)[0] || sections[0];
-    setActive(next.k);
-    next.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const currentIndex = Math.max(0, keys.indexOf(active));
+    const nextKey = keys[Math.min(currentIndex + 1, keys.length - 1)];
+    const el = document.getElementById(nextKey);
+    if (!el) return;
+    setActive(nextKey);
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   if (!isHome) return null;
 
   return (
-    <aside className='hidden md:flex fixed right-0 top-0 bottom-0 z-40 items-center pr-4'>
+    <aside className='hidden lg:flex fixed right-0 top-0 bottom-0 z-40 items-center pr-4'>
       <div className='flex flex-col items-center gap-3'>
         <button
           onClick={goNext}

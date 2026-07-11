@@ -82,15 +82,8 @@ export default function RunningProjectModal({
         ref={cardRef}
         onClick={(e) => e.stopPropagation()}
         className='relative w-full max-w-7xl max-h-[92vh] rounded-2xl border border-surface-hover bg-surface shadow-2xl overflow-hidden flex flex-col'>
-        <button
-          onClick={close}
-          className='absolute top-4 right-4 z-10 p-2 rounded-full bg-background/60 border border-surface-hover hover:border-primary/50 transition-colors'
-          aria-label='Close'>
-          <X size={18} />
-        </button>
-
         {/* Header segment: mode switch + media */}
-        <div className='border-b border-surface-hover bg-background/40 px-3 py-3 md:px-4 md:py-4 flex items-center justify-between gap-3'>
+        <div className='border-b border-surface-hover bg-background/40 px-3 py-3 md:px-4 md:py-4 flex flex-wrap items-center justify-between gap-3'>
           <div className='flex items-center gap-2 text-xs'>
             <button
               onClick={() => setMode('gallery')}
@@ -104,15 +97,24 @@ export default function RunningProjectModal({
               Live Preview
             </button>
           </div>
-          {project.link && (
-            <a
-              href={project.link}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='inline-flex items-center gap-2 rounded-full border border-surface-hover bg-background/60 px-3 py-1.5 text-xs font-medium hover:border-primary/50 transition-colors'>
-              Open in New Tab <ExternalLink size={14} />
-            </a>
-          )}
+          <div className='flex items-center gap-2 shrink-0'>
+            {project.link && (
+              <a
+                href={project.link}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='inline-flex items-center gap-2 rounded-full border border-surface-hover bg-background/60 px-3 py-1.5 text-xs font-medium hover:border-primary/50 transition-colors'>
+                <span className='hidden sm:inline'>Open in New Tab</span>
+                <ExternalLink size={14} />
+              </a>
+            )}
+            <button
+              onClick={close}
+              className='p-2 rounded-full bg-background/60 border border-surface-hover hover:border-primary/50 transition-colors'
+              aria-label='Close'>
+              <X size={18} />
+            </button>
+          </div>
         </div>
         {mode === 'gallery' ? (
           <Gallery slug={project.slug} primary={project.image} alt={`${project.name} preview`} />
@@ -252,12 +254,10 @@ function Gallery({ slug, primary, alt }: { slug: string; primary?: string; alt: 
       `/assets/images/projects/${slug}/image-1.png`,
       `/assets/images/projects/${slug}/image-2.png`,
       `/assets/images/projects/${slug}/image-3.png`,
-      `/assets/images/projects/${slug}/image copy.png`,
       `/assets/images/projects/${slug.replace(/-/g, '')}/image-1.png`,
       `/assets/images/projects/${slug.replace(/-/g, '')}/image-2.png`,
       `/assets/images/projects/${slug.replace(/-/g, '')}/image-3.png`,
       `/assets/images/projects/${slug.replace(/-/g, '')}/image.png`,
-      `/assets/images/projects/${slug.replace(/-/g, '')}/image copy.png`,
       primary || '/project-placeholder.svg',
       '/project-placeholder.svg',
     ],
