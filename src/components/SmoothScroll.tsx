@@ -36,6 +36,8 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     // Fonts and images settle after hydration; re-measure pins once they have.
     const refresh = () => ScrollTrigger.refresh();
+    // A reload without a hash always starts at the top: the hero intro and pins assume it.
+    if (!window.location.hash) lenis.scrollTo(0, { immediate: true, force: true });
     window.addEventListener('load', refresh);
     document.fonts?.ready.then(refresh);
 

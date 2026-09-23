@@ -60,7 +60,7 @@ export default function Preloader() {
       style={{ clipPath: 'inset(0 0 0% 0)' }}
     >
       <div data-inner className="flex w-full max-w-5xl flex-col gap-6 px-4 sm:px-8">
-        <div data-name className="overflow-hidden font-display text-4xl font-extrabold uppercase leading-none tracking-tight sm:text-7xl">
+        <div data-name className="overflow-hidden whitespace-nowrap font-display text-[7vw] font-extrabold uppercase leading-none tracking-tight lg:text-6xl">
           {profile.name.split('').map((c, i) => (
             <span key={i} className="inline-block whitespace-pre">
               {c}
