@@ -1,153 +1,89 @@
+import { getMediumPostBySlug, fetchMediumPosts } from '@/lib/medium';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock } from 'lucide-react';
-import Parser from 'rss-parser';
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-import parse from 'html-react-parser';
-import { cache } from 'react';
 import type { Metadata } from 'next';
+import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 
-const window = new JSDOM('').window;
-const purify = DOMPurify(window as any);
-
-const parser = new Parser({
-  customFields: {
-    item: ['content:encoded', 'categories'],
-  },
-});
-
-const getArticle = cache(async (slug: string) => {
-  try {
-    const feed = await parser.parseURL('https://medium.com/feed/@mahmud886');
-    
-    const article = feed.items.find((item: any) => {
-      const url = new URL(item.link);
-      const itemSlugMatch = url.pathname.match(/-([a-z0-9]+)$/);
-      const itemSlug = itemSlugMatch ? itemSlugMatch[1] : item.guid.split('/').pop();
-      return itemSlug === slug;
-    });
-
-    if (!article) return null;
-
-    const wordCount = article['content:encoded']?.replace(/<[^>]*>?/gm, '').split(/\s+/).length || 0;
-    const readingTime = Math.max(1, Math.ceil(wordCount / 200));
-
-    return {
-      title: article.title,
-      link: article.link,
-      pubDate: article.pubDate,
-      author: article.creator,
-      content: article['content:encoded'],
-      categories: article.categories || [],
-      readingTime: `${readingTime} min read`,
-    };
-  } catch (error) {
-    console.error('Error fetching article:', error);
-    return null;
-  }
-});
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const article = await getArticle(slug);
-
-  if (!article) {
-    return { title: 'Article Not Found | Iqbal Mahmud' };
-  }
-
-  const description = article.content
-    ?.replace(/<[^>]*>?/gm, '')
-    .trim()
-    .slice(0, 160);
-
-  return {
-    title: `${article.title} | Iqbal Mahmud`,
-    description,
-    openGraph: {
-      title: article.title,
-      description,
-      type: 'article',
-      publishedTime: article.pubDate,
-      authors: article.author ? [article.author] : undefined,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: article.title,
-      description,
-    },
-  };
+export async function generateStaticParams() {
+  const posts = await fetchMediumPosts('mahmud886');
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
 }
 
-export default async function BlogDetails({ params }: { params: Promise<{ slug: string }> }) {
-  const resolvedParams = await params;
-  const article = await getArticle(resolvedParams.slug);
+export const revalidate = 3600;
 
-  if (!article) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getMediumPostBySlug('mahmud886', slug);
+  return post ? { title: post.title, openGraph: { title: post.title, type: 'article', images: post.thumbnail ? [post.thumbnail] : undefined } } : {};
+}
+
+export default async function BlogPost({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const resolvedParams = await params;
+  const post = await getMediumPostBySlug('mahmud886', resolvedParams.slug);
+
+  if (!post) {
     notFound();
   }
 
-  const cleanContent = purify.sanitize(article.content);
-
   return (
-    <div className="rounded-3xl border border-surface-hover bg-surface overflow-hidden">
-      <div className="px-6 md:px-10 py-10 max-w-4xl mx-auto">
-        <Link href="/#blog" className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-10">
-          <ArrowLeft size={20} />
-          <span>Back to Articles</span>
+    <article className="min-h-screen bg-background text-foreground pt-32 pb-24">
+      <div className="container mx-auto px-6 max-w-3xl">
+        <Link 
+          href="/#blog" 
+          className="inline-flex items-center gap-2 text-foreground/60 hover:text-accent-2 transition-colors mb-8"
+        >
+          <FiArrowLeft /> Back to Home
         </Link>
+        
+        <header className="mb-12">
+          <div className="flex items-center gap-4 text-sm text-foreground/60 mb-6">
+            <time dateTime={post.pubDate}>
+              {new Date(post.pubDate).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </time>
+            <span>•</span>
+            <span>By {post.creator}</span>
+          </div>
+          
+          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight mb-8">
+            {post.title}
+          </h1>
 
-        <header className="mb-12 pb-8 border-b border-surface-hover">
-          <div className="flex flex-wrap gap-2 mb-6">
-            {article.categories.map((category: string) => (
-              <span key={category} className="px-3 py-1 bg-surface border border-surface-hover text-xs font-medium rounded-full text-text-muted">
+          <div className="flex items-center gap-4 pb-8 border-b border-line">
+            {post.categories.map((category) => (
+              <span key={category} className="text-xs px-3 py-1 bg-white/[0.04] rounded-full text-accent-2">
                 {category}
               </span>
             ))}
           </div>
-
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            {article.title}
-          </h1>
-
-          <div className="flex items-center gap-6 text-sm text-text-muted">
-            <div className="flex items-center gap-2">
-              <Calendar size={16} />
-              <span>{new Date(article.pubDate!).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock size={16} />
-              <span>{article.readingTime}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white text-xs font-bold">
-                IM
-              </span>
-              <span>{article.author}</span>
-            </div>
-          </div>
         </header>
 
-        {/* Article Content */}
-        <div className="prose prose-lg max-w-none prose-img:rounded-xl prose-a:text-primary hover:prose-a:text-secondary">
-          {parse(cleanContent)}
-        </div>
-
-        <div className="mt-16 pt-8 border-t border-surface-hover text-center">
-          <a
-            href={article.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-full font-medium hover:bg-primary-dark transition-colors"
+        <div 
+          className="prose prose-invert max-w-none prose-img:rounded-2xl prose-img:border prose-img:border-line prose-video:rounded-2xl prose-a:text-accent-2 hover:prose-a:text-blue-300"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+        
+        <footer className="mt-16 pt-8 border-t border-line flex justify-between items-center">
+          <a 
+            href={post.link} 
+            target="_blank" 
+            rel="noreferrer"
+            className="flex items-center gap-2 text-accent-2 hover:text-foreground transition-colors font-medium"
           >
-            Read Original on Medium
+            Read original on Medium <FiExternalLink />
           </a>
-        </div>
+          
+        </footer>
       </div>
-    </div>
+    </article>
   );
 }

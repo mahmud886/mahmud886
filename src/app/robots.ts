@@ -1,14 +1,9 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
+import { profile } from '@/lib/data';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://mahmud886.vercel.app';
-
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: '/private/',
-    },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    rules: { userAgent: '*', allow: '/' },
+    sitemap: `${profile.site}/sitemap.xml`,
   };
 }

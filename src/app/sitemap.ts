@@ -1,66 +1,17 @@
-import { MetadataRoute } from 'next';
-import Parser from 'rss-parser';
+import type { MetadataRoute } from 'next';
+import { experience, profile, projects } from '@/lib/data';
+import { fetchMediumPosts } from '@/lib/medium';
 
-const baseUrl = 'https://mahmud886.vercel.app';
-
-async function getProjectSlugs(): Promise<string[]> {
-  try {
-    const res = await fetch('https://api.github.com/users/mahmud886/repos?per_page=100&sort=updated', {
-      next: { revalidate: 3600 },
-      headers: {
-        Accept: 'application/vnd.github.v3+json',
-        ...(process.env.GITHUB_TOKEN && { Authorization: `token ${process.env.GITHUB_TOKEN}` }),
-      },
-    });
-    if (!res.ok) return [];
-    const repos = await res.json();
-    return repos.filter((repo: any) => !repo.fork).map((repo: any) => repo.name);
-  } catch {
-    return [];
-  }
-}
-
-async function getBlogSlugs(): Promise<string[]> {
-  try {
-    const parser = new Parser();
-    const feed = await parser.parseURL('https://medium.com/feed/@mahmud886');
-    return feed.items.map((item: any) => {
-      const url = new URL(item.link);
-      const slugMatch = url.pathname.match(/-([a-z0-9]+)$/);
-      return slugMatch ? slugMatch[1] : item.guid.split('/').pop();
-    });
-  } catch {
-    return [];
-  }
-}
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [projectSlugs, blogSlugs] = await Promise.all([getProjectSlugs(), getBlogSlugs()]);
-
+  const posts = await fetchMediumPosts('mahmud886');
+  const page = (path: string, priority: number) => ({ url: `${profile.site}${path}`, lastModified: new Date(), priority });
   return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/resume`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    ...projectSlugs.map((slug) => ({
-      url: `${baseUrl}/projects/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    })),
-    ...blogSlugs.map((slug) => ({
-      url: `${baseUrl}/blog/${slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    })),
+    page('', 1),
+    page('/resume', 0.9),
+    ...projects.map((p) => page(`/projects/${p.slug}`, 0.8)),
+    ...experience.map((j) => page(`/work/${j.slug}`, 0.6)),
+    ...posts.map((p) => page(`/blog/${p.slug}`, 0.5)),
   ];
 }

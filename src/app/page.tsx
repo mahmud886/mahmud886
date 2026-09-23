@@ -1,31 +1,41 @@
-import AboutSection from '@/components/sections/AboutSection';
-import BlogSection from '@/components/sections/BlogSection';
-import CertificationsSection from '@/components/sections/CertificationsSection';
-import ContactSection from '@/components/sections/ContactSection';
-import EducationSection from '@/components/sections/EducationSection';
-import HeroSection from '@/components/sections/HeroSection';
-import ProjectsSection from '@/components/sections/ProjectsSection';
-import RunningProjectsSection from '@/components/sections/RunningProjectsSection';
-import ServicesSection from '@/components/sections/ServicesSection';
-import SkillsAdvantagesSection from '@/components/sections/SkillsAdvantagesSection';
-import TestimonialsSection from '@/components/sections/TestimonialsSection';
-import WorkExperienceSection from '@/components/sections/WorkExperienceSection';
+import { Suspense } from 'react';
+import Hero from '@/components/Hero';
+import About from '@/components/About';
+import Story from '@/components/Story';
+import Projects from '@/components/Projects';
+import Services from '@/components/Services';
+import TextBand from '@/components/TextBand';
+import Skills from '@/components/Skills';
+import Process from '@/components/Process';
+import Experience from '@/components/Experience';
+import BlogSection from '@/components/BlogSection';
+import Contact from '@/components/Contact';
+import Preloader from '@/components/Preloader';
+import SceneBackground from '@/components/three/SceneBackground';
+
+// Medium feed is re-fetched at most hourly; the page itself stays static.
+export const revalidate = 3600;
 
 export default function Home() {
   return (
-    <div className='w-full flex flex-col gap-10'>
-      <HeroSection />
-      <AboutSection />
-      <ServicesSection />
-      <SkillsAdvantagesSection />
-      <WorkExperienceSection />
-      <EducationSection />
-      <CertificationsSection />
-      <RunningProjectsSection />
-      <ProjectsSection />
-      <BlogSection />
-      <TestimonialsSection />
-      <ContactSection />
-    </div>
+    <>
+      <Preloader />
+      <SceneBackground />
+      <main className="relative">
+        <Hero />
+        <About />
+        <Story />
+        <Projects />
+        <TextBand top="Fast by default" bottom="Unforgettable by design" />
+        <Services />
+        <Skills />
+        <Process />
+        <Experience />
+        <Suspense fallback={null}>
+          <BlogSection />
+        </Suspense>
+        <Contact />
+      </main>
+    </>
   );
 }

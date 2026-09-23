@@ -1,150 +1,217 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@theme {
-  --color-primary: var(--primary);
-  --color-primary-dark: var(--primary-dark);
-  --color-secondary: var(--secondary);
-  --color-secondary-dark: var(--secondary-dark);
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-surface-hover: var(--surface-hover);
-  --color-text-main: var(--text-main);
-  --color-text-muted: var(--text-muted);
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
 }
 
 :root {
-  --primary: #14cba8;
-  --primary-dark: #0fa588;
-  --secondary: #22c55e;
-  --secondary-dark: #16a34a;
-  --background: #0b0f12;
-  --surface: #141a1e;
-  --surface-hover: #1f2a30;
-  --scrollbar-thumb: #1f2a30;
-  --scrollbar-thumb-hover: #2b3a43;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-}
-
-:root[data-theme='light'] {
-  --primary: #0d9488;
-  --primary-dark: #0f766e;
-  --secondary: #16a34a;
-  --secondary-dark: #15803d;
-  --background: #f8fafc;
-  --surface: #ffffff;
-  --surface-hover: #e2e8f0;
-  --scrollbar-thumb: #cbd5e1;
-  --scrollbar-thumb-hover: #94a3b8;
-  --text-main: #0f172a;
-  --text-muted: #475569;
-
-  /* Darken the pale Tailwind palette shades used for skill-tag badges
-     (text-*-300/400) so they stay readable on light surfaces. */
-  --color-amber-300: #b45309;
-  --color-blue-300: #1d4ed8;
-  --color-blue-400: #1d4ed8;
-  --color-cyan-300: #0e7490;
-  --color-emerald-300: #047857;
-  --color-fuchsia-300: #a21caf;
-  --color-green-300: #15803d;
-  --color-indigo-300: #4338ca;
-  --color-lime-300: #4d7c0f;
-  --color-orange-300: #c2410c;
-  --color-pink-300: #be185d;
-  --color-purple-300: #7e22ce;
-  --color-red-300: #b91c1c;
-  --color-rose-300: #be123c;
-  --color-sky-300: #0369a1;
-  --color-slate-200: #334155;
-  --color-teal-300: #0f766e;
-  --color-violet-300: #6d28d9;
-  --color-yellow-300: #a16207;
-  --color-zinc-200: #3f3f46;
-}
-
-body {
-  background-color: var(--color-background);
-  color: var(--color-text-main);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  --bg: #05060a;
+  --fg: #eef0f7;
+  --muted: #8a8fa3;
+  --line: rgba(255, 255, 255, 0.08);
+  --accent: #7c5cff;
+  --accent-2: #00e5ff;
+  --accent-3: #ff4fd8;
+  --gradient: linear-gradient(100deg, var(--accent-2), var(--accent) 45%, var(--accent-3));
+  color-scheme: dark;
 }
 
 html {
-  scroll-behavior: smooth;
+  background: var(--bg);
+  /* Belt and braces: a stray wide element must never widen the mobile layout viewport. */
+  overflow-x: clip;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-background);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 10px;
+::selection {
+  background: var(--accent);
+  color: #fff;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: 9999px;
+@utility text-gradient {
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
+@utility text-stroke {
+  -webkit-text-stroke: 1px rgba(238, 240, 247, 0.35);
+  color: transparent;
 }
 
-/* Theme-aware typography (replaces prose-invert, which hardcodes dark-mode colors) */
-.prose {
-  --tw-prose-body: var(--color-text-muted);
-  --tw-prose-headings: var(--color-text-main);
-  --tw-prose-lead: var(--color-text-muted);
-  --tw-prose-links: var(--color-primary);
-  --tw-prose-bold: var(--color-text-main);
-  --tw-prose-counters: var(--color-text-muted);
-  --tw-prose-bullets: var(--color-surface-hover);
-  --tw-prose-hr: var(--color-surface-hover);
-  --tw-prose-quotes: var(--color-text-main);
-  --tw-prose-quote-borders: var(--color-surface-hover);
-  --tw-prose-captions: var(--color-text-muted);
-  --tw-prose-code: var(--color-text-main);
-  --tw-prose-pre-code: var(--color-text-main);
-  --tw-prose-pre-bg: var(--color-background);
-  --tw-prose-th-borders: var(--color-surface-hover);
-  --tw-prose-td-borders: var(--color-surface-hover);
+@utility glass {
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-/* Keeps resume PDF export (html2pdf.js) from slicing an entry across two
-   pages. Must live in a real stylesheet, not injected via onclone, because
-   html2pdf reads computed styles for its page-break scan before html2canvas
-   (and its onclone hook) ever runs. */
-.pdf-keep {
-  break-inside: avoid;
-  page-break-inside: avoid;
+@utility eyebrow {
+  font-family: var(--font-geist-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
-/* Hide cursor if we use a custom one */
-@media (pointer: fine) {
-  body {
-    cursor: none;
+/* Film grain over everything — cheap, static, GPU-composited */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.marquee-track {
+  animation: marquee var(--marquee-speed, 30s) linear infinite;
+}
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
   }
-  a, button, [role="button"] {
-    cursor: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .has-cursor,
+  .has-cursor * {
+    cursor: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Pre-hydration: keep animated hero pieces hidden until GSAP has set their start state. */
+.js [data-hero-name],
+.js [data-hero-fade],
+.js [data-case-title] {
+  visibility: hidden;
+}
+html[data-intro='seen'] [data-preloader] {
+  display: none;
+}
+
+/* Resume → clean A4 when printed / saved as PDF */
+@page {
+  size: A4;
+  margin: 10mm;
+}
+@media print {
+  :root {
+    color-scheme: light;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  header,
+  .grain,
+  .resume-chrome,
+  [data-preloader],
+  [aria-hidden] {
+    display: none !important;
+  }
+  .resume-sheet header {
+    display: flex !important;
+  }
+  .resume-page {
+    padding: 0 !important;
+  }
+  .resume-sheet {
+    max-width: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .resume-sheet * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .resume-avoid-break {
+    break-inside: avoid;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Navbar: rotating gradient hairline around the floating island */
+@property --nav-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.nav-border {
+  background: conic-gradient(
+    from var(--nav-angle),
+    rgba(255, 255, 255, 0.08) 0 55%,
+    var(--accent-2) 70%,
+    var(--accent) 80%,
+    var(--accent-3) 90%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  animation: nav-spin 7s linear infinite;
+}
+@keyframes nav-spin {
+  to {
+    --nav-angle: 360deg;
+  }
+}
+/* Hover text roll: the label slides up and an identical copy slides in from below. */
+.roll {
+  display: inline-flex;
+  overflow: hidden;
+  height: 1.25em;
+  line-height: 1.25em;
+}
+.roll > span {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.group:hover .roll > span,
+.group:focus-visible .roll > span {
+  transform: translateY(-50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-border {
+    animation: none;
   }
 }

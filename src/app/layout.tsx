@@ -1,106 +1,54 @@
-import CustomCursor from '@/components/ui/CustomCursor';
-import RightRail from '@/components/ui/RightRail';
-import ScrollGuard from '@/components/ui/ScrollGuard';
-import Sidebar from '@/components/ui/Sidebar';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Geist, Geist_Mono, Syne } from 'next/font/google';
 import './globals.css';
+import SmoothScroll from '@/components/SmoothScroll';
+import Navbar from '@/components/Navbar';
+import CustomCursor from '@/components/CustomCursor';
+import { profile } from '@/lib/data';
 
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-});
+const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
+const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
+const syne = Syne({ variable: '--font-display', subsets: ['latin'], weight: ['600', '700', '800'] });
+
+const title = `${profile.name} — ${profile.role}`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://mahmud886.vercel.app'),
-  title: 'Iqbal Mahmud | Developer Portfolio',
-  description:
-    'Software Engineer passionate about crafting high-performance web applications and seamless user experiences. Specializing in Next.js, React, and modern frontend ecosystems to build scalable, interactive, and beautifully animated interfaces.',
-  keywords: [
-    'Iqbal Mahmud',
-    'Software Engineer',
-    'Frontend Developer',
-    'React Developer',
-    'Next.js',
-    'Web Developer',
-    'Dhaka',
-    'Bangladesh',
-  ],
-  authors: [{ name: 'Iqbal Mahmud' }],
-  creator: 'Iqbal Mahmud',
-  publisher: 'Iqbal Mahmud',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
+  metadataBase: new URL(profile.site),
+  title: { default: title, template: `%s — ${profile.name}` },
+  description: profile.intro,
+  authors: [{ name: profile.name }],
   openGraph: {
-    title: 'Iqbal Mahmud | Software Engineer',
-    description:
-      'Software Engineer passionate about crafting high-performance web applications and seamless user experiences.',
-    url: 'https://mahmud886.vercel.app',
-    siteName: 'Iqbal Mahmud Portfolio',
-    images: [
-      {
-        url: '/assets/images/profile-image.jpg', // Update this if you add a specific OG image
-        width: 800,
-        height: 600,
-        alt: 'Iqbal Mahmud',
-      },
-    ],
-    locale: 'en_US',
+    title,
+    description: profile.intro,
+    url: profile.site,
+    siteName: profile.name,
+    images: [{ url: profile.photo, alt: profile.name }],
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Iqbal Mahmud | Software Engineer',
-    description:
-      'Software Engineer passionate about crafting high-performance web applications and seamless user experiences.',
-    images: ['/assets/images/profile-image.jpg'], // Update this if you add a specific OG image
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  twitter: { card: 'summary_large_image', title, description: profile.intro, images: [profile.photo] },
 };
 
-const themeInitScript = `
-(function () {
-  try {
-    var stored = localStorage.getItem('theme');
-    var theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
-    document.documentElement.setAttribute('data-theme', theme);
-  } catch (e) {}
-})();
-`;
+export const viewport: Viewport = {
+  themeColor: '#05060a',
+};
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang='en' className='scroll-smooth' suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
-        <link rel='canonical' href='https://mahmud886.vercel.app' />
-        <meta name='theme-color' content='#0b0f12' />
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.classList.add('js');try{if(sessionStorage.getItem('intro-seen')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.dataset.intro='seen'}catch(e){}`,
+          }}
+        />
       </head>
-      <body className={`${inter.variable} antialiased bg-background text-text-main min-h-screen flex flex-col`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} antialiased`}>
         <CustomCursor />
-        <ScrollGuard />
-        <Sidebar />
-        <RightRail />
-        <main className='flex-grow lg:pl-[340px] lg:pr-[84px] pt-[72px] lg:pt-0'>
-          <div className='mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-6 py-6'>{children}</div>
-        </main>
+        <SmoothScroll>
+          <Navbar />
+          {children}
+        </SmoothScroll>
+        <div className="grain" aria-hidden />
       </body>
     </html>
   );
