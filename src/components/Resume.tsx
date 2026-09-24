@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
 import { experience, moreProjects, profile, projects } from '@/lib/data';
-import Magnetic from './Magnetic';
 
 // Classic single-column layout modelled on the PDF resume: easy for humans and ATS parsers alike.
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -63,25 +62,25 @@ export default function Resume() {
   );
 
   return (
-    <main ref={root} className="resume-page relative z-10 px-3 pb-24 pt-24 sm:px-8 sm:pt-32">
+    <main ref={root} className="resume-page relative z-10 px-3 pb-24 pt-10 sm:px-8 sm:pt-16">
       <div data-resume-top className="resume-chrome mx-auto mb-8 flex max-w-[860px] flex-col gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="eyebrow mb-3">— Curriculum vitae</p>
-          <h1 className="font-display text-5xl font-extrabold tracking-tight sm:text-7xl">
-            Resume<span className="text-gradient">.</span>
+          <p className="label mb-3">
+            <span className="text-accent">~/</span>resume
+          </p>
+          <h1 className="text-5xl font-semibold tracking-[-0.04em] sm:text-7xl">
+            Resume<span className="text-accent">.</span>
           </h1>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Magnetic>
-            <a
-              href={profile.cv}
-              download={`${profile.cvName}.pdf`}
-              className="inline-flex items-center gap-2 rounded-full bg-[image:var(--gradient)] px-5 py-3 text-sm font-semibold text-background"
-            >
-              Download PDF ↓
-            </a>
-          </Magnetic>
-          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full glass px-5 py-3 text-sm">
+          <a
+            href={profile.cv}
+            download={`${profile.cvName}.pdf`}
+            className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-accent"
+          >
+            Download PDF ↓
+          </a>
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-md border border-line px-5 py-3 text-sm font-medium transition-colors hover:border-ink/40">
             Print
           </button>
         </div>
@@ -90,7 +89,7 @@ export default function Resume() {
       <div className="[perspective:1600px]">
         <article
           data-sheet
-          className="resume-sheet relative mx-auto max-w-[860px] origin-top rounded-[6px] bg-white px-5 py-8 text-[#1a1a22] shadow-[0_40px_120px_-20px_rgba(124,92,255,0.45)] sm:px-12 sm:py-12"
+          className="resume-sheet relative mx-auto max-w-[860px] origin-top rounded-[6px] bg-white px-5 py-8 text-[#1a1a22] border border-line shadow-[0_30px_80px_-30px_rgba(0,0,0,0.35)] sm:px-12 sm:py-12"
         >
           {/* Header */}
           <header data-sheet-item className="flex flex-col gap-4 border-b border-[#dcdce4] pb-5 sm:flex-row sm:items-end sm:justify-between">

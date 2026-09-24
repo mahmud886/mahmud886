@@ -1,43 +1,85 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
-  --color-background: var(--bg);
-  --color-foreground: var(--fg);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
-  --color-accent-2: var(--accent-2);
-  --color-accent-3: var(--accent-3);
+  --color-link: var(--link);
+  --color-ok: var(--ok);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-display);
+  --font-serif: var(--font-serif);
 }
 
+/* Light: warm drafting paper, ink, safety orange. */
 :root {
-  --bg: #05060a;
-  --fg: #eef0f7;
-  --muted: #8a8fa3;
-  --line: rgba(255, 255, 255, 0.08);
-  --accent: #7c5cff;
-  --accent-2: #00e5ff;
-  --accent-3: #ff4fd8;
-  --gradient: linear-gradient(100deg, var(--accent-2), var(--accent) 45%, var(--accent-3));
+  --paper: #f5f3ee;
+  --paper-2: #ecE9e1;
+  --ink: #16161a;
+  --ink-2: #3b3b44;
+  --muted: #74737c;
+  --line: rgba(22, 22, 26, 0.1);
+  --grid: rgba(22, 22, 26, 0.045);
+  --accent: #ff5a1f;
+  --link: #2447d6;
+  --ok: #17a34a;
+  --code-key: #2447d6;
+  --code-str: #b4430d;
+  --code-com: #8a8993;
+  color-scheme: light;
+}
+
+/* Dark: blueprint at night. */
+[data-theme='dark'] {
+  --paper: #0d0e11;
+  --paper-2: #15161b;
+  --ink: #ecebe6;
+  --ink-2: #c3c2bd;
+  --muted: #8b8a92;
+  --line: rgba(236, 235, 230, 0.1);
+  --grid: rgba(236, 235, 230, 0.04);
+  --accent: #ff6a33;
+  --link: #8aa2ff;
+  --ok: #3ddc84;
+  --code-key: #8aa2ff;
+  --code-str: #ffab7a;
+  --code-com: #6d6c75;
   color-scheme: dark;
 }
 
 html {
-  background: var(--bg);
-  /* Belt and braces: a stray wide element must never widen the mobile layout viewport. */
+  background: var(--paper);
   overflow-x: clip;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  overflow-x: clip;
+  background-color: var(--paper);
+  /* 24px blueprint grid with a stronger line every 4 cells */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:
+    24px 24px,
+    24px 24px,
+    96px 96px,
+    96px 96px;
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 ::selection {
@@ -45,85 +87,86 @@ body {
   color: #fff;
 }
 
-/* Lenis */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-.lenis.lenis-stopped {
-  overflow: clip;
-}
-
-@utility text-gradient {
-  background: var(--gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@utility text-stroke {
-  -webkit-text-stroke: 1px rgba(238, 240, 247, 0.35);
-  color: transparent;
-}
-
-@utility glass {
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
-  border: 1px solid var(--line);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-@utility eyebrow {
+@utility label {
   font-family: var(--font-geist-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-/* Film grain over everything — cheap, static, GPU-composited */
-.grain {
-  position: fixed;
-  inset: -50%;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+@utility card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
 
-.marquee-track {
-  animation: marquee var(--marquee-speed, 30s) linear infinite;
-}
-@keyframes marquee {
-  to {
-    transform: translate3d(-50%, 0, 0);
+/* Crosshair corner ticks, drafting-sheet style */
+@utility ticks {
+  position: relative;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-color: var(--ink);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  &::before {
+    top: -5px;
+    left: -5px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  &::after {
+    bottom: -5px;
+    right: -5px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
   }
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .has-cursor,
-  .has-cursor * {
-    cursor: none !important;
+.caret::after {
+  content: '▍';
+  margin-left: 1px;
+  animation: blink 1s steps(1) infinite;
+  color: var(--accent);
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
   }
+}
+
+/* Reveal-on-scroll, driven by an IntersectionObserver that adds .in */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+[data-reveal].in,
+.no-js [data-reveal] {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track {
+  html {
+    scroll-behavior: auto;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .caret::after {
     animation: none;
   }
-}
-
-/* Pre-hydration: keep animated hero pieces hidden until GSAP has set their start state. */
-.js [data-hero-name],
-.js [data-hero-fade],
-.js [data-case-title] {
-  visibility: hidden;
-}
-html[data-intro='seen'] [data-preloader] {
-  display: none;
 }
 
 /* Resume → clean A4 when printed / saved as PDF */
@@ -132,7 +175,8 @@ html[data-intro='seen'] [data-preloader] {
   margin: 10mm;
 }
 @media print {
-  :root {
+  :root,
+  [data-theme='dark'] {
     color-scheme: light;
   }
   html,
@@ -140,9 +184,8 @@ html[data-intro='seen'] [data-preloader] {
     background: #fff !important;
   }
   header,
-  .grain,
+  footer.site-footer,
   .resume-chrome,
-  [data-preloader],
   [aria-hidden] {
     display: none !important;
   }
@@ -158,6 +201,7 @@ html[data-intro='seen'] [data-preloader] {
     box-shadow: none !important;
     transform: none !important;
     opacity: 1 !important;
+    border: 0 !important;
   }
   .resume-sheet * {
     opacity: 1 !important;
@@ -169,49 +213,5 @@ html[data-intro='seen'] [data-preloader] {
   * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-  }
-}
-
-/* Navbar: rotating gradient hairline around the floating island */
-@property --nav-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-.nav-border {
-  background: conic-gradient(
-    from var(--nav-angle),
-    rgba(255, 255, 255, 0.08) 0 55%,
-    var(--accent-2) 70%,
-    var(--accent) 80%,
-    var(--accent-3) 90%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
-  animation: nav-spin 7s linear infinite;
-}
-@keyframes nav-spin {
-  to {
-    --nav-angle: 360deg;
-  }
-}
-/* Hover text roll: the label slides up and an identical copy slides in from below. */
-.roll {
-  display: inline-flex;
-  overflow: hidden;
-  height: 1.25em;
-  line-height: 1.25em;
-}
-.roll > span {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1);
-}
-.group:hover .roll > span,
-.group:focus-visible .roll > span {
-  transform: translateY(-50%);
-}
-@media (prefers-reduced-motion: reduce) {
-  .nav-border {
-    animation: none;
   }
 }

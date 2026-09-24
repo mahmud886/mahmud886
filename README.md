@@ -2,7 +2,7 @@
 
 Personal site of Iqbal Mahmud, Software Engineer — live at [mahmud886.vercel.app](https://mahmud886.vercel.app).
 
-Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · GSAP (ScrollTrigger, SplitText) · Lenis · React Three Fiber.
+Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · GSAP. No WebGL — static-first and fast.
 
 ## Develop
 
@@ -23,4 +23,11 @@ Everything on the site — profile, experience, projects, resume — lives in `s
 npm run build && npm run resume:pdf
 ```
 
-The previous version of the site is preserved on the `legacy-v2` branch.
+## Versions
+
+| Branch | Design |
+|---|---|
+| `v4-engineer` | Engineer's blueprint: light/dark, live terminal, git-log experience, ⌘K palette |
+| `eclipse-bg` | v3 futuristic site with the pixel-art eclipse / video background |
+| `master` | v3 futuristic site (GSAP + 3D blob) |
+| `legacy-v2` | The previous site |

@@ -32,17 +32,17 @@ export default async function BlogPost({
   }
 
   return (
-    <article className="min-h-screen bg-background text-foreground pt-32 pb-24">
-      <div className="container mx-auto px-6 max-w-3xl">
+    <article className="pb-24 pt-10 sm:pt-16">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <Link 
           href="/#blog" 
-          className="inline-flex items-center gap-2 text-foreground/60 hover:text-accent-2 transition-colors mb-8"
+          className="inline-flex items-center gap-2 mb-8 font-mono text-[12px] text-muted transition-colors hover:text-ink"
         >
           <FiArrowLeft /> Back to Home
         </Link>
         
         <header className="mb-12">
-          <div className="flex items-center gap-4 text-sm text-foreground/60 mb-6">
+          <div className="mb-6 flex items-center gap-4 font-mono text-[12px] text-muted">
             <time dateTime={post.pubDate}>
               {new Date(post.pubDate).toLocaleDateString('en-US', {
                 month: 'long',
@@ -54,13 +54,13 @@ export default async function BlogPost({
             <span>By {post.creator}</span>
           </div>
           
-          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight mb-8">
+          <h1 className="mb-8 text-4xl font-semibold tracking-tight md:text-5xl">
             {post.title}
           </h1>
 
           <div className="flex items-center gap-4 pb-8 border-b border-line">
             {post.categories.map((category) => (
-              <span key={category} className="text-xs px-3 py-1 bg-white/[0.04] rounded-full text-accent-2">
+              <span key={category} className="rounded border border-line px-2 py-0.5 font-mono text-[11px] text-ink-2">
                 {category}
               </span>
             ))}
@@ -68,7 +68,7 @@ export default async function BlogPost({
         </header>
 
         <div 
-          className="prose prose-invert max-w-none prose-img:rounded-2xl prose-img:border prose-img:border-line prose-video:rounded-2xl prose-a:text-accent-2 hover:prose-a:text-blue-300"
+          className="prose max-w-none dark:prose-invert prose-headings:tracking-tight prose-img:rounded-2xl prose-img:border prose-img:border-line prose-video:rounded-2xl prose-a:text-link hover:prose-a:text-blue-300"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
         
@@ -77,7 +77,7 @@ export default async function BlogPost({
             href={post.link} 
             target="_blank" 
             rel="noreferrer"
-            className="flex items-center gap-2 text-accent-2 hover:text-foreground transition-colors font-medium"
+            className="flex items-center gap-2 font-mono text-[12px] text-link hover:underline"
           >
             Read original on Medium <FiExternalLink />
           </a>
