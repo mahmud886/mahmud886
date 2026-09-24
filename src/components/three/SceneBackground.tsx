@@ -17,7 +17,7 @@ export default function SceneBackground({ dim = false }: { dim?: boolean }) {
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
-      <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_75%_30%,rgba(124,92,255,0.18),transparent_70%),radial-gradient(40%_40%_at_15%_80%,rgba(0,229,255,0.10),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(22%_22%_at_72%_36%,rgba(255,214,170,0.10),transparent_70%),radial-gradient(80%_30%_at_50%_100%,rgba(200,20,10,0.22),transparent_70%)]" />
       {ready && (
         <div className={`absolute inset-0 animate-[fadeIn_1.6s_ease_forwards] opacity-0 ${dim ? '[--to:0.35]' : '[--to:1]'}`}>
           <Scene />

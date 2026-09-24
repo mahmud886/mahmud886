@@ -5,217 +5,170 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { scrollState } from '@/lib/scroll-store';
 
-const noise = /* glsl */ `
-  // Ashima 3D simplex noise
-  vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
-  vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-  float snoise(vec3 v){
-    const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1.0,2.0);
-    vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);
-    vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.0-g;vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);
-    vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+C.yyy;vec3 x3=x0-D.yyy;
-    i=mod289(i);
-    vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
-    float n_=0.142857142857;vec3 ns=n_*D.wyz-D.xzx;
-    vec4 j=p-49.0*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.0*x_);
-    vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.0-abs(x)-abs(y);
-    vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
-    vec4 s0=floor(b0)*2.0+1.0;vec4 s1=floor(b1)*2.0+1.0;vec4 sh=-step(h,vec4(0.0));
-    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-    vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
-    vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-    p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
-    vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);m=m*m;
-    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+// One full-screen quad; everything (stars, eclipse, clouds, red horizon) is drawn in the fragment shader.
+const vertex = /* glsl */ `
+  void main() {
+    gl_Position = vec4(position.xy, 0.0, 1.0);
   }
 `;
 
-const blobVertex = /* glsl */ `
+const fragment = /* glsl */ `
+  precision highp float;
   uniform float uTime;
-  uniform float uDistort;
-  varying vec3 vNormal;
-  varying vec3 vView;
-  varying float vNoise;
-  ${noise}
-  float field(vec3 p){
-    return (snoise(p * 1.2 + uTime * 0.3) + snoise(p * 2.6 - uTime * 0.18) * 0.3) * uDistort;
-  }
-  vec3 displace(vec3 p){ return p + normalize(p) * field(p); }
-  void main(){
-    // Recompute the normal from neighbouring displaced points so lighting follows the wobble.
-    vec3 p = position;
-    vec3 t = normalize(cross(normal, abs(normal.y) < 0.99 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0)));
-    vec3 bt = normalize(cross(normal, t));
-    float e = 0.01;
-    vec3 d0 = displace(p);
-    vec3 d1 = displace(normalize(p + t * e));
-    vec3 d2 = displace(normalize(p + bt * e));
-    vec3 n = normalize(cross(d1 - d0, d2 - d0));
-    if (dot(n, normal) < 0.0) n = -n;
-    vNoise = field(p);
-    vec4 mv = modelViewMatrix * vec4(d0, 1.0);
-    vView = normalize(-mv.xyz);
-    vNormal = normalize(normalMatrix * n);
-    gl_Position = projectionMatrix * mv;
-  }
-`;
+  uniform vec2 uRes;
+  uniform float uP;        // page scroll progress 0..1
+  uniform float uVel;      // smoothed scroll speed 0..1
+  uniform vec2 uPointer;   // -1..1
+  uniform float uMobile;
 
-const blobFragment = /* glsl */ `
-  uniform float uTime;
-  uniform float uHue;
-  varying vec3 vNormal;
-  varying vec3 vView;
-  varying float vNoise;
-  vec3 grad(float t){
-    vec3 c1 = vec3(0.0, 0.9, 1.0);   // cyan
-    vec3 c2 = vec3(0.49, 0.36, 1.0); // violet
-    vec3 c3 = vec3(1.0, 0.31, 0.85); // magenta
-    return t < 0.5 ? mix(c1, c2, t * 2.0) : mix(c2, c3, t * 2.0 - 1.0);
+  float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
   }
-  void main(){
-    vec3 n = normalize(vNormal);
-    float fres = pow(1.0 - clamp(dot(n, vView), 0.0, 1.0), 2.0);
-    float t = 0.5 + 0.5 * sin(6.2831 * (n.y * 0.35 + n.x * 0.25 + vNoise * 0.9 + uHue + uTime * 0.04));
-    vec3 iri = grad(t);
-    vec3 col = mix(vec3(0.02, 0.02, 0.06), iri, 0.18 + fres * 0.95);
-    vec3 L = normalize(vec3(-0.4, 0.8, 0.6));
-    float spec = pow(max(dot(reflect(-L, n), vView), 0.0), 28.0);
-    col += spec * 0.55 + pow(fres, 4.0) * iri * 0.6;
+  float noise(vec2 p) {
+    vec2 i = floor(p), f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+  }
+  float fbm(vec2 p) {
+    float v = 0.0, a = 0.5;
+    mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+    for (int i = 0; i < 5; i++) { v += a * noise(p); p = m * p; a *= 0.5; }
+    return v;
+  }
+  mat2 rot(float a) { float s = sin(a), c = cos(a); return mat2(c, -s, s, c); }
+
+  void main() {
+    vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;   // y spans -0.5..0.5
+    float p = uP;
+    bool mobile = uMobile > 0.5;
+
+    // --- Choreography: hero (upper right) -> drifts left mid-page -> centred above the horizon at the end.
+    vec2 c = mobile ? vec2(0.0, 0.2) : vec2(0.45, 0.13);
+    c = mix(c, mobile ? vec2(0.0, 0.16) : vec2(-0.42, 0.08), smoothstep(0.08, 0.45, p));
+    c = mix(c, vec2(0.0, 0.12), smoothstep(0.72, 1.0, p));
+    c += uPointer * vec2(0.025, 0.018);
+    float R = (mobile ? 0.12 : 0.155) * (1.0 - 0.12 * sin(p * 3.14159));
+
+    vec2 d = uv - c;
+    float r = length(d);
+    float ang = atan(d.y, d.x);
+
+    // --- Sky + stars
+    vec3 col = mix(vec3(0.004, 0.005, 0.012), vec3(0.016, 0.02, 0.045), smoothstep(-0.5, 0.6, uv.y));
+    vec2 sg = uv * 170.0;
+    float sh = hash(floor(sg));
+    float star = step(0.982, sh) * smoothstep(0.45, 0.0, length(fract(sg) - 0.5));
+    col += star * (0.55 + 0.45 * sin(uTime * 1.7 + sh * 50.0)) * vec3(0.85, 0.9, 1.0);
+
+    // --- Corona: streaky glow hugging the disc, plus a wide violet halo
+    float streak = fbm(vec2(ang * 2.5 + 11.0, r * 5.0 - uTime * 0.04));
+    float outside = smoothstep(R * 0.99, R * 1.02, r);
+    col += exp(-(r - R) * 20.0) * outside * (0.35 + 0.9 * streak) * vec3(1.0, 0.8, 0.6) * 0.7;
+    col += exp(-(r - R) * 5.0) * outside * vec3(0.3, 0.18, 0.42) * 0.16;
+
+    // --- The moon: a clean black disc
+    col = mix(col, vec3(0.004, 0.004, 0.008), smoothstep(R * 1.005, R * 0.99, r));
+
+    // --- Thin burning ring on the limb
+    col += exp(-abs(r - R) * 240.0) * vec3(1.0, 0.93, 0.82) * 1.3;
+
+    // --- Diamond-ring flare travelling round the limb with scroll + pointer
+    float fa = 0.35 + p * 3.14159 + uPointer.x * 0.35 + uTime * 0.02;
+    vec2 fp = c + R * vec2(cos(fa), sin(fa));
+    vec2 fd = uv - fp;
+    float flare = 0.0022 / (dot(fd, fd) + 0.00045);
+    vec2 fr = rot(0.785) * fd;
+    float spikes = exp(-abs(fd.y) * 380.0) * exp(-abs(fd.x) * 10.0)
+                 + exp(-abs(fd.x) * 380.0) * exp(-abs(fd.y) * 10.0)
+                 + 0.5 * (exp(-abs(fr.y) * 420.0) * exp(-abs(fr.x) * 18.0) + exp(-abs(fr.x) * 420.0) * exp(-abs(fr.y) * 18.0));
+    col += (flare * 0.35 + spikes * 0.9) * vec3(1.0, 0.92, 0.8);
+
+    // --- Clouds: fbm in a domain that twists around the eclipse, lit orange-red on their edges
+    float t = uTime * 0.018 + p * 1.6 + uVel * 0.3;
+    vec2 rd = rot(0.9 / (r + 0.25) + t) * d;
+    float n = fbm(rd * 3.2 + vec2(0.0, t * 0.8));
+    float n2 = fbm(rd * 7.0 - n * 1.6 + 3.0);
+    float density = n * 0.7 + n2 * 0.45;
+    float cloud = smoothstep(0.5, 0.82, density) * smoothstep(R * 1.15, R * 2.6, r);
+    float edge = clamp(cloud * (1.0 - cloud) * 4.0, 0.0, 1.0);
+    float sunLight = exp(-(r - R) * 2.6);
+    vec3 cloudBody = mix(vec3(0.012, 0.014, 0.028), vec3(0.06, 0.07, 0.11), n2 * n2);
+    vec3 cloudRim = vec3(1.0, 0.5, 0.28) * sunLight * 1.1 + vec3(0.16, 0.2, 0.34) * 0.35;
+    col = mix(col, cloudBody + cloudRim * edge * edge, cloud * 0.95);
+
+    // --- Red horizon + sea, rising as you reach the end of the page
+    float rise = smoothstep(0.55, 1.0, p);
+    float hY = mix(-0.47, -0.2, rise) + (mobile ? 0.02 : 0.0);
+    float above = uv.y - hY;
+    float glowStrength = 0.3 + 0.8 * rise;
+    col += vec3(0.95, 0.06, 0.03) * exp(-max(above, 0.0) * 13.0) * glowStrength;
+    if (above < 0.0) {
+      float depth = -above;
+      float waves = fbm(vec2(uv.x * 5.0 + uTime * 0.03, depth * 60.0 / (depth * 6.0 + 0.2)));
+      vec3 sea = vec3(0.08, 0.005, 0.01) + vec3(0.95, 0.09, 0.05) * exp(-depth * 7.0) * (0.35 + 0.8 * waves);
+      sea += vec3(1.0, 0.3, 0.15) * exp(-abs(uv.x - c.x) * 7.0) * exp(-depth * 5.0) * 0.45 * smoothstep(0.45, 0.8, waves);
+      col = mix(col, sea * glowStrength * 1.2, smoothstep(0.0, 0.008, depth));
+    }
+    col += vec3(1.0, 0.3, 0.12) * exp(-abs(above) * 140.0) * 0.7 * glowStrength;
+
+    // --- Keep the middle of the page calmer so body copy stays readable
+    col *= mix(1.0, 0.62, smoothstep(0.14, 0.3, p) * (1.0 - smoothstep(0.82, 0.96, p)));
+
+    // --- Vignette + soft tone curve
+    col *= 1.0 - 0.55 * dot(uv * vec2(0.75, 1.0), uv * vec2(0.75, 1.0));
+    col = 1.0 - exp(-col * 1.2);
+    col = pow(col, vec3(1.12));
     gl_FragColor = vec4(col, 1.0);
   }
 `;
 
-function damp(current: number, target: number, lambda: number, dt: number) {
-  return THREE.MathUtils.damp(current, target, lambda, dt);
-}
-
-function Blob({ isMobile }: { isMobile: boolean }) {
-  const mesh = useRef<THREE.Mesh>(null!);
-  const wire = useRef<THREE.Mesh>(null!);
+function Eclipse() {
   const material = useRef<THREE.ShaderMaterial>(null!);
+  const { size, gl } = useThree();
   const uniforms = useMemo(
-    () => ({ uTime: { value: 0 }, uDistort: { value: 0.3 }, uHue: { value: 0 } }),
+    () => ({
+      uTime: { value: 0 },
+      uRes: { value: new THREE.Vector2(1, 1) },
+      uP: { value: 0 },
+      uVel: { value: 0 },
+      uPointer: { value: new THREE.Vector2() },
+      uMobile: { value: 0 },
+    }),
     []
   );
   const smooth = useRef({ p: 0, v: 0, px: 0, py: 0 });
 
   useFrame((state, dt) => {
     const s = smooth.current;
-    s.p = damp(s.p, scrollState.progress, 4, dt);
-    s.v = damp(s.v, Math.min(Math.abs(scrollState.velocity) / 40, 1), 3, dt);
-    s.px = damp(s.px, scrollState.pointerX, 2.5, dt);
-    s.py = damp(s.py, scrollState.pointerY, 2.5, dt);
+    s.p = THREE.MathUtils.damp(s.p, scrollState.progress, 4, dt);
+    s.v = THREE.MathUtils.damp(s.v, Math.min(Math.abs(scrollState.velocity) / 40, 1), 3, dt);
+    s.px = THREE.MathUtils.damp(s.px, scrollState.pointerX, 2.5, dt);
+    s.py = THREE.MathUtils.damp(s.py, scrollState.pointerY, 2.5, dt);
 
-    const p = s.p;
     const u = material.current.uniforms;
     u.uTime.value = state.clock.elapsedTime;
-    u.uDistort.value = 0.16 + s.v * 0.22 + Math.sin(p * Math.PI) * 0.08;
-    u.uHue.value = p * 0.6;
-
-    // Choreography: hero right → centre and closer → drifts left → recedes at the end.
-    const baseX = isMobile ? 0 : 2.3;
-    const x = THREE.MathUtils.lerp(baseX, isMobile ? 0 : -2.2, THREE.MathUtils.smoothstep(p, 0.08, 0.45));
-    const xEnd = THREE.MathUtils.lerp(x, 0, THREE.MathUtils.smoothstep(p, 0.7, 1));
-    const y = (isMobile ? 1.1 : 0.35) + Math.sin(p * Math.PI * 2) * 0.35;
-    const scale = (isMobile ? 0.8 : 1) * (1 + Math.sin(p * Math.PI) * 0.25);
-
-    mesh.current.position.set(xEnd + s.px * 0.25, y + s.py * 0.2, 0);
-    mesh.current.rotation.set(p * Math.PI * 2 + s.py * 0.3, p * Math.PI * 3 + state.clock.elapsedTime * 0.1 + s.px * 0.4, 0);
-    mesh.current.scale.setScalar(scale);
-
-    wire.current.position.copy(mesh.current.position);
-    wire.current.rotation.set(Math.PI / 2.4 + p * 2, state.clock.elapsedTime * 0.15, p * Math.PI);
-    wire.current.scale.setScalar(scale * 1.55);
-
-    state.camera.position.x = damp(state.camera.position.x, s.px * 0.35, 3, dt);
-    state.camera.position.y = damp(state.camera.position.y, s.py * 0.25, 3, dt);
-    state.camera.position.z = 6 - Math.sin(p * Math.PI) * 1.2;
-    state.camera.lookAt(0, 0, 0);
+    u.uP.value = s.p;
+    u.uVel.value = s.v;
+    u.uPointer.value.set(s.px, s.py);
+    u.uRes.value.set(size.width * gl.getPixelRatio(), size.height * gl.getPixelRatio());
+    u.uMobile.value = size.width < 768 ? 1 : 0;
   });
 
   return (
-    <>
-      <mesh ref={mesh}>
-        <icosahedronGeometry args={[1, isMobile ? 32 : 64]} />
-        <shaderMaterial ref={material} vertexShader={blobVertex} fragmentShader={blobFragment} uniforms={uniforms} />
-      </mesh>
-      <mesh ref={wire}>
-        <torusGeometry args={[1, 0.004, 8, 160]} />
-        <meshBasicMaterial color="#7c5cff" transparent opacity={0.55} />
-      </mesh>
-    </>
-  );
-}
-
-// Seeded PRNG so the star field is identical on every render (and lint-pure).
-function mulberry32(seed: number) {
-  return () => {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function Particles({ count }: { count: number }) {
-  const ref = useRef<THREE.Points>(null!);
-  const geometry = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    const col = new Float32Array(count * 3);
-    const palette = [new THREE.Color('#00e5ff'), new THREE.Color('#7c5cff'), new THREE.Color('#ff4fd8'), new THREE.Color('#ffffff')];
-    const rand = mulberry32(886);
-    for (let i = 0; i < count; i++) {
-      const r = 4 + rand() * 10;
-      const theta = rand() * Math.PI * 2;
-      const phi = Math.acos(2 * rand() - 1);
-      pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      pos[i * 3 + 2] = r * Math.cos(phi) - 4;
-      const c = palette[i % palette.length];
-      col.set([c.r, c.g, c.b], i * 3);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    return g;
-  }, [count]);
-
-  useFrame((state, dt) => {
-    const p = scrollState.progress;
-    ref.current.rotation.y += dt * 0.02 + Math.abs(scrollState.velocity) * 0.0004;
-    ref.current.rotation.x = damp(ref.current.rotation.x, p * 1.2, 2, dt);
-    ref.current.position.z = damp(ref.current.position.z, p * 6, 2, dt);
-  });
-
-  return (
-    <points ref={ref} geometry={geometry}>
-      <pointsMaterial size={0.035} vertexColors transparent opacity={0.85} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
-    </points>
-  );
-}
-
-function Rig() {
-  const { size } = useThree();
-  const isMobile = size.width < 768;
-  return (
-    <>
-      <Blob isMobile={isMobile} />
-      <Particles count={isMobile ? 700 : 1800} />
-    </>
+    <mesh frustumCulled={false}>
+      <planeGeometry args={[2, 2]} />
+      <shaderMaterial ref={material} vertexShader={vertex} fragmentShader={fragment} uniforms={uniforms} depthWrite={false} depthTest={false} />
+    </mesh>
   );
 }
 
 export default function Scene() {
   return (
-    <Canvas
-      dpr={[1, 1.5]}
-      camera={{ position: [0, 0, 6], fov: 45 }}
-      gl={{ antialias: false, powerPreference: 'high-performance', alpha: true }}
-    >
-      <Rig />
+    <Canvas dpr={[1, 1.5]} gl={{ antialias: false, powerPreference: 'high-performance', alpha: false }} flat>
+      <Eclipse />
     </Canvas>
   );
 }
