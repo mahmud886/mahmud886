@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { scrollState } from '@/lib/scroll-store';
@@ -35,10 +35,20 @@ const fragment = /* glsl */ `
   float fbm(vec2 p) {
     float v = 0.0, a = 0.5;
     mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-    for (int i = 0; i < 5; i++) { v += a * noise(p); p = m * p; a *= 0.5; }
+    for (int i = 0; i < 6; i++) { v += a * noise(p); p = m * p; a *= 0.5; }
+    return v;
+  }
+  // Billow noise: folded fbm gives round, puffy lobes instead of flat blotches.
+  float billow(vec2 p) {
+    float v = 0.0, a = 0.5;
+    mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+    for (int i = 0; i < 5; i++) { v += a * abs(noise(p) * 2.0 - 1.0); p = m * p; a *= 0.5; }
     return v;
   }
   mat2 rot(float a) { float s = sin(a), c = cos(a); return mat2(c, -s, s, c); }
+  // Ordered (Bayer 4x4) dither threshold in [0,1): gives the pixel-art gradient texture.
+  float bayer2(vec2 a) { a = floor(a); return fract(dot(a, vec2(0.5, a.y * 0.75))); }
+  float bayer4(vec2 a) { return bayer2(0.5 * a) * 0.25 + bayer2(a); }
 
   void main() {
     vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;   // y spans -0.5..0.5
@@ -50,77 +60,104 @@ const fragment = /* glsl */ `
     c = mix(c, mobile ? vec2(0.0, 0.16) : vec2(-0.42, 0.08), smoothstep(0.08, 0.45, p));
     c = mix(c, vec2(0.0, 0.12), smoothstep(0.72, 1.0, p));
     c += uPointer * vec2(0.025, 0.018);
-    float R = (mobile ? 0.12 : 0.155) * (1.0 - 0.12 * sin(p * 3.14159));
+    float R = (mobile ? 0.12 : 0.15) * (1.0 - 0.12 * sin(p * 3.14159));
 
     vec2 d = uv - c;
     float r = length(d);
     float ang = atan(d.y, d.x);
 
-    // --- Sky + stars
-    vec3 col = mix(vec3(0.004, 0.005, 0.012), vec3(0.016, 0.02, 0.045), smoothstep(-0.5, 0.6, uv.y));
-    vec2 sg = uv * 170.0;
-    float sh = hash(floor(sg));
-    float star = step(0.982, sh) * smoothstep(0.45, 0.0, length(fract(sg) - 0.5));
-    col += star * (0.55 + 0.45 * sin(uTime * 1.7 + sh * 50.0)) * vec3(0.85, 0.9, 1.0);
+    // --- Deep navy sky with a dense, colour-varied starfield
+    vec3 col = mix(vec3(0.008, 0.012, 0.035), vec3(0.02, 0.04, 0.1), smoothstep(-0.5, 0.6, uv.y));
+    vec2 sg = uv * 140.0;
+    vec2 si = floor(sg);
+    float sh = hash(si);
+    float star = step(0.955, sh) * smoothstep(0.5, 0.1, length(fract(sg) - 0.5 + (hash(si + 7.0) - 0.5) * 0.4));
+    vec3 starCol = mix(vec3(0.7, 0.8, 1.0), vec3(1.0, 0.85, 0.7), hash(si + 3.0));
+    col += star * (0.45 + 0.55 * sin(uTime * 1.5 + sh * 60.0)) * starCol * (0.5 + 0.8 * step(0.992, sh));
 
-    // --- Corona: streaky glow hugging the disc, plus a wide violet halo
+    // --- Corona, moon, burning limb
     float streak = fbm(vec2(ang * 2.5 + 11.0, r * 5.0 - uTime * 0.04));
     float outside = smoothstep(R * 0.99, R * 1.02, r);
-    col += exp(-(r - R) * 20.0) * outside * (0.35 + 0.9 * streak) * vec3(1.0, 0.8, 0.6) * 0.7;
-    col += exp(-(r - R) * 5.0) * outside * vec3(0.3, 0.18, 0.42) * 0.16;
-
-    // --- The moon: a clean black disc
-    col = mix(col, vec3(0.004, 0.004, 0.008), smoothstep(R * 1.005, R * 0.99, r));
-
-    // --- Thin burning ring on the limb
-    col += exp(-abs(r - R) * 240.0) * vec3(1.0, 0.93, 0.82) * 1.3;
-
-    // --- Diamond-ring flare travelling round the limb with scroll + pointer
+    col += exp(-(r - R) * 22.0) * outside * (0.3 + 0.9 * streak) * vec3(1.0, 0.85, 0.7) * 0.6;
+    col = mix(col, vec3(0.0), smoothstep(R * 1.005, R * 0.99, r));
+    // Limb is brightest on the flare side, like a real diamond ring.
     float fa = 0.35 + p * 3.14159 + uPointer.x * 0.35 + uTime * 0.02;
+    float limbBias = 0.45 + 0.55 * max(cos(ang - fa), 0.0);
+    col += exp(-abs(r - R) * 300.0) * vec3(1.0, 0.95, 0.88) * 1.5 * limbBias;
+
+    // --- Diamond-ring flare
     vec2 fp = c + R * vec2(cos(fa), sin(fa));
     vec2 fd = uv - fp;
-    float flare = 0.0022 / (dot(fd, fd) + 0.00045);
+    float flare = 0.0016 / (dot(fd, fd) + 0.0003);
     vec2 fr = rot(0.785) * fd;
-    float spikes = exp(-abs(fd.y) * 380.0) * exp(-abs(fd.x) * 10.0)
-                 + exp(-abs(fd.x) * 380.0) * exp(-abs(fd.y) * 10.0)
-                 + 0.5 * (exp(-abs(fr.y) * 420.0) * exp(-abs(fr.x) * 18.0) + exp(-abs(fr.x) * 420.0) * exp(-abs(fr.y) * 18.0));
-    col += (flare * 0.35 + spikes * 0.9) * vec3(1.0, 0.92, 0.8);
+    float spikes = exp(-abs(fd.y) * 420.0) * exp(-abs(fd.x) * 9.0)
+                 + exp(-abs(fd.x) * 420.0) * exp(-abs(fd.y) * 9.0)
+                 + 0.45 * (exp(-abs(fr.y) * 480.0) * exp(-abs(fr.x) * 20.0) + exp(-abs(fr.x) * 480.0) * exp(-abs(fr.y) * 20.0));
+    col += (flare * 0.35 + spikes) * vec3(1.0, 0.93, 0.82);
 
-    // --- Clouds: fbm in a domain that twists around the eclipse, lit orange-red on their edges
-    float t = uTime * 0.018 + p * 1.6 + uVel * 0.3;
-    vec2 rd = rot(0.9 / (r + 0.25) + t) * d;
-    float n = fbm(rd * 3.2 + vec2(0.0, t * 0.8));
-    float n2 = fbm(rd * 7.0 - n * 1.6 + 3.0);
-    float density = n * 0.7 + n2 * 0.45;
-    float cloud = smoothstep(0.5, 0.82, density) * smoothstep(R * 1.15, R * 2.6, r);
-    float edge = clamp(cloud * (1.0 - cloud) * 4.0, 0.0, 1.0);
-    float sunLight = exp(-(r - R) * 2.6);
-    vec3 cloudBody = mix(vec3(0.012, 0.014, 0.028), vec3(0.06, 0.07, 0.11), n2 * n2);
-    vec3 cloudRim = vec3(1.0, 0.5, 0.28) * sunLight * 1.1 + vec3(0.16, 0.2, 0.34) * 0.35;
-    col = mix(col, cloudBody + cloudRim * edge * edge, cloud * 0.95);
-
-    // --- Red horizon + sea, rising as you reach the end of the page
+    // --- Clouds: layered, swirling round the eclipse, with a clear window of stars around the sun
     float rise = smoothstep(0.55, 1.0, p);
     float hY = mix(-0.47, -0.2, rise) + (mobile ? 0.02 : 0.0);
+    float t = uTime * 0.015 + p * 1.6 + uVel * 0.3;
+    vec2 rd = rot(0.75 / (r + 0.3) + t) * d;
+    vec2 q = rd * vec2(2.0, 3.0);
+    float n = fbm(q + vec2(0.0, t * 0.6));                         // large banks
+    float puffs = billow(q * 2.6 + n * 1.2 + 5.0);                 // round lobes inside them
+    float dens = n * 0.75 + (1.0 - puffs) * 0.45 - 0.05;
+    dens -= (1.0 - smoothstep(R * 1.4, R * 3.4, r)) * 0.5;         // clear window round the sun
+    dens += smoothstep(0.1, hY, uv.y) * 0.1;                       // thicker banks toward the horizon
+    float cloud = smoothstep(0.52, 0.56, dens);
+
+    // Light each lobe on the side facing the sun (slope of the density field), shade the far side.
+    vec2 toSun = normalize(-d);
+    vec2 g = vec2(dFdx(dens), dFdy(dens));
+    float facing = clamp(-dot(normalize(g + 1e-6), toSun), 0.0, 1.0);
+    float sunLight = exp(-(r - R) * 1.6);
+    float inner = smoothstep(0.54, 0.8, dens);
+    vec3 body = mix(vec3(0.025, 0.032, 0.065), vec3(0.09, 0.11, 0.17), inner);
+    body *= 0.7 + 0.5 * (1.0 - puffs);
+    vec3 lit = vec3(0.6, 0.64, 0.74) * pow(facing, 3.5) * (0.25 + 0.75 * sunLight);
+
+    // Warm crest light on the sun-facing edge of every bank, red near the horizon.
+    float crest = clamp(cloud * (1.0 - cloud) * 4.0, 0.0, 1.0) * facing;
+    float warmth = clamp(sunLight * 1.3 + smoothstep(hY + 0.35, hY, uv.y) * (0.5 + rise), 0.0, 1.0);
+    vec3 warm = mix(vec3(1.0, 0.6, 0.35), vec3(1.0, 0.2, 0.08), smoothstep(0.0, hY, uv.y));
+    vec3 crestCol = mix(vec3(0.75, 0.8, 0.92), warm, warmth);
+    vec3 cloudCol = body + lit * (1.0 - inner * 0.6) + crestCol * crest * 1.4;
+    col = mix(col, cloudCol, cloud);
+
+    // --- Red horizon + glittering sea, rising toward the contact section
     float above = uv.y - hY;
-    float glowStrength = 0.3 + 0.8 * rise;
-    col += vec3(0.95, 0.06, 0.03) * exp(-max(above, 0.0) * 13.0) * glowStrength;
+    float glowStrength = 0.3 + 0.85 * rise;
+    col += vec3(1.0, 0.05, 0.03) * exp(-max(above, 0.0) * 12.0) * glowStrength;
     if (above < 0.0) {
       float depth = -above;
-      float waves = fbm(vec2(uv.x * 5.0 + uTime * 0.03, depth * 60.0 / (depth * 6.0 + 0.2)));
-      vec3 sea = vec3(0.08, 0.005, 0.01) + vec3(0.95, 0.09, 0.05) * exp(-depth * 7.0) * (0.35 + 0.8 * waves);
-      sea += vec3(1.0, 0.3, 0.15) * exp(-abs(uv.x - c.x) * 7.0) * exp(-depth * 5.0) * 0.45 * smoothstep(0.45, 0.8, waves);
-      col = mix(col, sea * glowStrength * 1.2, smoothstep(0.0, 0.008, depth));
+      float waves = fbm(vec2(uv.x * 7.0 + uTime * 0.04, depth * 70.0 / (depth * 6.0 + 0.2)));
+      vec3 sea = vec3(0.1, 0.0, 0.01) + vec3(1.0, 0.08, 0.04) * exp(-depth * 6.0) * (0.3 + 0.9 * waves);
+      float glitter = step(0.78, waves) * exp(-abs(uv.x - c.x) * 5.0) * exp(-depth * 4.0);
+      sea += vec3(1.0, 0.55, 0.35) * glitter * 0.9;
+      col = mix(col, sea * glowStrength * 1.25, smoothstep(0.0, 0.006, depth));
     }
-    col += vec3(1.0, 0.3, 0.12) * exp(-abs(above) * 140.0) * 0.7 * glowStrength;
+    col += vec3(1.0, 0.35, 0.15) * exp(-abs(above) * 160.0) * 0.8 * glowStrength;
+
+    // --- Foreground rocks, silhouetted and rim-lit red, emerging at the end of the page
+    float rockTop = -0.5 + rise * (0.06 + 0.16 * fbm(vec2(uv.x * 2.2, 4.0)) * (0.35 + abs(uv.x) * 1.4));
+    float rockEdge = rockTop - uv.y;
+    if (rockEdge > 0.0) {
+      float grain = fbm(uv * 26.0);
+      vec3 rock = vec3(0.02, 0.012, 0.02) + vec3(0.12, 0.03, 0.03) * grain;
+      rock += vec3(1.0, 0.15, 0.06) * exp(-rockEdge * 90.0) * 0.8 * rise;
+      col = rock;
+    }
 
     // --- Keep the middle of the page calmer so body copy stays readable
-    col *= mix(1.0, 0.62, smoothstep(0.14, 0.3, p) * (1.0 - smoothstep(0.82, 0.96, p)));
+    col *= mix(1.0, 0.45, smoothstep(0.12, 0.26, p) * (1.0 - smoothstep(0.84, 0.96, p)));
 
-    // --- Vignette + soft tone curve
-    col *= 1.0 - 0.55 * dot(uv * vec2(0.75, 1.0), uv * vec2(0.75, 1.0));
-    col = 1.0 - exp(-col * 1.2);
-    col = pow(col, vec3(1.12));
+    // --- Vignette, tone curve, then dithered colour quantisation for the pixel-art finish
+    col *= 1.0 - 0.5 * dot(uv * vec2(0.75, 1.0), uv * vec2(0.75, 1.0));
+    col = 1.0 - exp(-col * 1.25);
+    float levels = 14.0;
+    col = floor(col * levels + bayer4(gl_FragCoord.xy)) / levels;
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -166,8 +203,18 @@ function Eclipse() {
 }
 
 export default function Scene() {
+  // Render at a fraction of the screen resolution and upscale with hard edges: that is the pixel-art look,
+  // and it makes the shader several times cheaper.
+  const [pixelRatio] = useState(() => (window.innerWidth < 768 ? 0.6 : 0.5));
   return (
-    <Canvas dpr={[1, 1.5]} gl={{ antialias: false, powerPreference: 'high-performance', alpha: false }} flat>
+    <Canvas
+      dpr={pixelRatio}
+      gl={{ antialias: false, powerPreference: 'high-performance', alpha: false }}
+      flat
+      onCreated={({ gl }) => {
+        gl.domElement.style.imageRendering = 'pixelated';
+      }}
+    >
       <Eclipse />
     </Canvas>
   );
