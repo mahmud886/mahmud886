@@ -45,6 +45,22 @@ const fragment = /* glsl */ `
     for (int i = 0; i < 5; i++) { v += a * abs(noise(p) * 2.0 - 1.0); p = m * p; a *= 0.5; }
     return v;
   }
+  vec2 hash2(vec2 p) {
+    return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
+  }
+  // Worley F1: distance to the nearest feature point. 1 - F1 is a field of round bumps —
+  // unioned, their edges scallop like cumulus / cauliflower clouds.
+  float worley(vec2 p) {
+    vec2 i = floor(p), f = fract(p);
+    float m = 1.0;
+    for (int y = -1; y <= 1; y++)
+      for (int x = -1; x <= 1; x++) {
+        vec2 o = vec2(float(x), float(y));
+        vec2 h = hash2(i + o);
+        m = min(m, length(o + h - f));
+      }
+    return m;
+  }
   mat2 rot(float a) { float s = sin(a), c = cos(a); return mat2(c, -s, s, c); }
   // Ordered (Bayer 4x4) dither threshold in [0,1): gives the pixel-art gradient texture.
   float bayer2(vec2 a) { a = floor(a); return fract(dot(a, vec2(0.5, a.y * 0.75))); }
@@ -56,11 +72,14 @@ const fragment = /* glsl */ `
     bool mobile = uMobile > 0.5;
 
     // --- Choreography: hero (upper right) -> drifts left mid-page -> centred above the horizon at the end.
-    vec2 c = mobile ? vec2(0.0, 0.2) : vec2(0.45, 0.13);
-    c = mix(c, mobile ? vec2(0.0, 0.16) : vec2(-0.42, 0.08), smoothstep(0.08, 0.45, p));
+    float aspect = uRes.x / uRes.y;
+    // Keep the whole eclipse on screen however narrow the window is.
+    float edgeX = aspect * 0.5 - 0.3;
+    vec2 c = mobile ? vec2(0.0, 0.2) : vec2(min(0.45, edgeX), 0.13);
+    c = mix(c, mobile ? vec2(0.0, 0.16) : vec2(-min(0.42, edgeX), 0.08), smoothstep(0.08, 0.45, p));
     c = mix(c, vec2(0.0, 0.12), smoothstep(0.72, 1.0, p));
     c += uPointer * vec2(0.025, 0.018);
-    float R = (mobile ? 0.12 : 0.15) * (1.0 - 0.12 * sin(p * 3.14159));
+    float R = (mobile ? 0.13 : 0.175) * (1.0 - 0.12 * sin(p * 3.14159));
 
     vec2 d = uv - c;
     float r = length(d);
@@ -99,31 +118,34 @@ const fragment = /* glsl */ `
     float rise = smoothstep(0.55, 1.0, p);
     float hY = mix(-0.47, -0.2, rise) + (mobile ? 0.02 : 0.0);
     float t = uTime * 0.015 + p * 1.6 + uVel * 0.3;
-    vec2 rd = rot(0.75 / (r + 0.3) + t) * d;
-    vec2 q = rd * vec2(2.0, 3.0);
-    float n = fbm(q + vec2(0.0, t * 0.6));                         // large banks
-    float puffs = billow(q * 2.6 + n * 1.2 + 5.0);                 // round lobes inside them
-    float dens = n * 0.75 + (1.0 - puffs) * 0.45 - 0.05;
-    dens -= (1.0 - smoothstep(R * 1.4, R * 3.4, r)) * 0.5;         // clear window round the sun
-    dens += smoothstep(0.1, hY, uv.y) * 0.1;                       // thicker banks toward the horizon
-    float cloud = smoothstep(0.52, 0.56, dens);
+    vec2 rd = rot(0.6 / (r + 0.35) + t) * d;
+    // Concentric cloud walls spiralling round the eclipse, broken up into round puffs.
+    float n = fbm(rd * 2.2 + vec2(0.0, t * 0.5));
+    float bands = 0.5 + 0.5 * sin(r * 15.0 - n * 6.0 - t * 2.0);
+    float puffs = 1.0 - worley(rd * 5.5 + n * 1.2);
+    float puffsSmall = 1.0 - worley(rd * 12.0 - n * 2.0 + 7.0);
+    float dens = n * 0.5 + bands * 0.2 + puffs * 0.42 + puffsSmall * 0.14 - 0.1;
+    dens -= (1.0 - smoothstep(R * 1.3, R * 3.2, r)) * 0.6;          // clear window of stars round the sun
+    dens += smoothstep(0.1, hY, uv.y) * 0.12;                        // thicker banks toward the horizon
+    float cloud = smoothstep(0.5, 0.535, dens);
 
-    // Light each lobe on the side facing the sun (slope of the density field), shade the far side.
+    // Light: whole banks catch light on their sun side; small puffs get silver speckles.
     vec2 toSun = normalize(-d);
-    vec2 g = vec2(dFdx(dens), dFdy(dens));
-    float facing = clamp(-dot(normalize(g + 1e-6), toSun), 0.0, 1.0);
-    float sunLight = exp(-(r - R) * 1.6);
-    float inner = smoothstep(0.54, 0.8, dens);
-    vec3 body = mix(vec3(0.025, 0.032, 0.065), vec3(0.09, 0.11, 0.17), inner);
-    body *= 0.7 + 0.5 * (1.0 - puffs);
-    vec3 lit = vec3(0.6, 0.64, 0.74) * pow(facing, 3.5) * (0.25 + 0.75 * sunLight);
+    float facing = clamp(-dot(normalize(vec2(dFdx(dens), dFdy(dens)) + 1e-6), toSun), 0.0, 1.0);
+    float facingPuff = clamp(-dot(normalize(vec2(dFdx(puffs), dFdy(puffs)) + 1e-6), toSun), 0.0, 1.0);
+    float sunLight = exp(-(r - R) * 1.5);
+    float inner = smoothstep(0.52, 0.8, dens);
+    vec3 body = mix(vec3(0.03, 0.04, 0.085), vec3(0.08, 0.1, 0.17), inner) * (0.75 + 0.45 * puffs);
+    vec3 silver = vec3(0.78, 0.82, 0.92);
+    vec3 lit = silver * (pow(facing, 3.0) * 0.35 + pow(facingPuff, 5.0) * 0.4 * inner) * (0.35 + 0.65 * sunLight);
 
-    // Warm crest light on the sun-facing edge of every bank, red near the horizon.
-    float crest = clamp(cloud * (1.0 - cloud) * 4.0, 0.0, 1.0) * facing;
-    float warmth = clamp(sunLight * 1.3 + smoothstep(hY + 0.35, hY, uv.y) * (0.5 + rise), 0.0, 1.0);
-    vec3 warm = mix(vec3(1.0, 0.6, 0.35), vec3(1.0, 0.2, 0.08), smoothstep(0.0, hY, uv.y));
-    vec3 crestCol = mix(vec3(0.75, 0.8, 0.92), warm, warmth);
-    vec3 cloudCol = body + lit * (1.0 - inner * 0.6) + crestCol * crest * 1.4;
+    // Crest: bright rim where a bank meets open sky — silver up high, gold near the sun, red by the horizon.
+    float crest = clamp(cloud * (1.0 - cloud) * 4.0, 0.0, 1.0) * (0.35 + 0.65 * facing);
+    float nearHorizon = smoothstep(hY + 0.3, hY, uv.y) * (0.4 + 0.6 * rise);
+    vec3 crestCol = mix(silver, vec3(1.0, 0.72, 0.45), clamp(sunLight * 1.2, 0.0, 1.0));
+    crestCol = mix(crestCol, vec3(1.0, 0.22, 0.1), nearHorizon);
+    vec3 cloudCol = body + lit * 1.3 + crestCol * crest * 1.9;
+    cloudCol += vec3(0.8, 0.08, 0.04) * nearHorizon * 0.25 * inner;  // red bounce light on low banks
     col = mix(col, cloudCol, cloud);
 
     // --- Red horizon + glittering sea, rising toward the contact section
@@ -136,6 +158,8 @@ const fragment = /* glsl */ `
       vec3 sea = vec3(0.1, 0.0, 0.01) + vec3(1.0, 0.08, 0.04) * exp(-depth * 6.0) * (0.3 + 0.9 * waves);
       float glitter = step(0.78, waves) * exp(-abs(uv.x - c.x) * 5.0) * exp(-depth * 4.0);
       sea += vec3(1.0, 0.55, 0.35) * glitter * 0.9;
+      float sparkle = step(0.985, hash(floor(gl_FragCoord.xy * 0.5) + floor(uTime * 3.0)));
+      sea += vec3(1.0, 0.7, 0.55) * sparkle * exp(-depth * 4.0) * exp(-abs(uv.x - c.x) * 2.5) * 0.9;
       col = mix(col, sea * glowStrength * 1.25, smoothstep(0.0, 0.006, depth));
     }
     col += vec3(1.0, 0.35, 0.15) * exp(-abs(above) * 160.0) * 0.8 * glowStrength;
@@ -149,6 +173,10 @@ const fragment = /* glsl */ `
       rock += vec3(1.0, 0.15, 0.06) * exp(-rockEdge * 90.0) * 0.8 * rise;
       col = rock;
     }
+
+    // --- Hero: soft shadow behind the name and intro copy
+    vec2 hm = uv - (mobile ? vec2(0.0, -0.18) : vec2(-0.55, -0.12));
+    col *= 1.0 - 0.5 * exp(-dot(hm, hm) * 3.5) * (1.0 - smoothstep(0.04, 0.14, p));
 
     // --- Keep the middle of the page calmer so body copy stays readable
     col *= mix(1.0, 0.45, smoothstep(0.12, 0.26, p) * (1.0 - smoothstep(0.84, 0.96, p)));
