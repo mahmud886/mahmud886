@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
-import { profile } from '@/lib/data';
+import { background, profile } from '@/lib/data';
 import Magnetic from './Magnetic';
 import LocalTime from './LocalTime';
 
@@ -67,6 +67,14 @@ export default function Contact() {
         <footer className="mt-20 grid gap-6 border-t border-line pt-6 text-sm text-muted sm:mt-28 sm:grid-cols-3 sm:items-center">
           <div>
             © {new Date().getFullYear()} {profile.name}
+            {background.video?.credit && (
+              <div className="mt-1 text-xs">
+                Background art by{' '}
+                <a href={background.video.credit.href} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
+                  {background.video.credit.name}
+                </a>
+              </div>
+            )}
           </div>
           <div className="flex gap-5 sm:justify-center">
             {profile.socials.map((s) => (

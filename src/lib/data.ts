@@ -322,3 +322,25 @@ export const moreProjects = [
 
 export type Project = (typeof projects)[number];
 export type Job = (typeof experience)[number];
+
+export type BackgroundVideo = {
+  /** Desktop file, e.g. '/bg/background.mp4' (produced by `npm run bg:encode`). */
+  src: string;
+  /** Lighter file for phones; falls back to `src`. */
+  mobileSrc?: string;
+  /** Shown while the video loads, and instead of it for reduced motion / data saver. */
+  poster: string;
+  /** 'loop' plays on repeat; 'scroll' ties the playhead to page scroll. */
+  mode: 'loop' | 'scroll';
+  /** Shown in the footer when the art isn't yours. */
+  credit?: { name: string; href: string };
+};
+
+/**
+ * Page background. With `video: null` the built-in WebGL eclipse is used.
+ * To use a video: run `npm run bg:encode path/to/video.mp4`, then set
+ * video: { src: '/bg/background.mp4', mobileSrc: '/bg/background-mobile.mp4', poster: '/bg/background-poster.jpg', mode: 'loop' }
+ */
+export const background: { video: BackgroundVideo | null } = {
+  video: null,
+};
