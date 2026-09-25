@@ -59,10 +59,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <div data-reveal className="label">
             <span className="text-accent">case_{String(index + 1).padStart(2, '0')}</span> · {p.kind}
           </div>
-          <h1 data-reveal style={{ ['--i' as string]: 1 }} className="mt-3 text-5xl font-semibold tracking-[-0.04em] sm:text-7xl">
+          <h1 data-reveal style={{ ['--i' as string]: 1 }} className="mt-3 font-display text-5xl font-bold tracking-[-0.035em] sm:text-7xl">
             {p.title}
           </h1>
-          <p data-reveal style={{ ['--i' as string]: 2 }} className="mt-4 font-serif text-2xl leading-snug text-ink-2 sm:text-3xl">
+          <p data-reveal style={{ ['--i' as string]: 2 }} className="mt-4 text-lg leading-relaxed text-ink-2 sm:text-xl">
             {p.overview}
           </p>
         </div>
@@ -79,7 +79,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             href={p.link}
             target="_blank"
             rel="noreferrer"
-            className="mt-5 inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-accent"
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-pop px-5 py-3 text-sm font-semibold text-pop-ink transition-transform hover:scale-[1.03]"
           >
             Visit live site ↗
           </a>
@@ -180,7 +180,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <Link href={`/projects/${next.slug}`} data-reveal className="group mt-24 flex items-end justify-between gap-6 border-t border-line pt-6">
         <div>
           <div className="label">Next case study</div>
-          <div className="mt-2 text-4xl font-semibold tracking-tight transition-colors group-hover:text-accent sm:text-6xl">{next.title}</div>
+          <div className="mt-2 font-display text-4xl font-bold tracking-tight transition-colors group-hover:text-accent sm:text-6xl">{next.title}</div>
         </div>
         <span className="mb-2 text-3xl transition-transform group-hover:translate-x-2">→</span>
       </Link>

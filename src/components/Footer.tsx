@@ -4,36 +4,28 @@ import LocalTime from './LocalTime';
 
 // Vercel injects the deployed commit; locally it is simply "dev".
 const sha = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'dev';
-const builtAt = new Date().toISOString().slice(0, 10);
 
 export default function Footer() {
   return (
-    <footer className="site-footer border-t border-line">
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 font-mono text-[11px] text-muted sm:grid-cols-3 sm:px-6">
-        <div className="space-y-1">
-          <div className="text-ink">© {new Date().getFullYear()} {profile.name}</div>
-          <div>Designed &amp; engineered in Dhaka.</div>
+    <footer className="site-footer mx-auto max-w-6xl px-3 pb-6 sm:px-6">
+      <div className="tile flex flex-col gap-4 px-6 py-5 text-[13px] text-ink-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-pop" />
+          <span className="font-medium text-ink">
+            © {new Date().getFullYear()} {profile.name}
+          </span>
+          <span className="text-muted">· Dhaka <LocalTime /></span>
         </div>
-        <div className="space-y-1">
-          <div>
-            build <span className="text-ink">{sha}</span> · {builtAt}
-          </div>
-          <div>Next.js · TypeScript · Tailwind · Vercel</div>
-        </div>
-        <div className="space-y-1 sm:text-right">
-          <div className="flex gap-4 sm:justify-end">
-            {profile.socials.map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="transition-colors hover:text-ink">
-                {s.label}
-              </a>
-            ))}
-            <Link href="/resume" className="transition-colors hover:text-ink">
-              Resume
-            </Link>
-          </div>
-          <div>
-            Dhaka <LocalTime /> <span className="text-ok">●</span> online
-          </div>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          {profile.socials.map((s) => (
+            <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="transition-colors hover:text-ink">
+              {s.label}
+            </a>
+          ))}
+          <Link href="/resume" className="transition-colors hover:text-ink">
+            Resume
+          </Link>
+          <span className="font-mono text-[11px] text-muted">build {sha}</span>
         </div>
       </div>
     </footer>

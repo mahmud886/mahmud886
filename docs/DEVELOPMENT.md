@@ -29,7 +29,9 @@ npm run build && npm run resume:pdf
 
 | Branch | Design |
 |---|---|
+| `v5-bento` | Bento: glassy tiles, aurora, spotlight hover, project cards that expand into a modal (motion) |
 | `v4-engineer` | Engineer's blueprint: light/dark, live terminal, git-log experience, ⌘K palette |
 | `eclipse-bg` | v3 futuristic site with the pixel-art eclipse / video background |
-| `master` | v3 futuristic site (GSAP + 3D blob) |
+| `master` | Live site |
+| `legacy-v3` | v3 futuristic site (GSAP + 3D blob) |
 | `legacy-v2` | The previous site |

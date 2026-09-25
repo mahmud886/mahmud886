@@ -59,10 +59,10 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
         </div>
 
         <div className="px-5 py-8 sm:px-8">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
             {j.role} <span className="text-muted">@</span> {j.company}
           </h1>
-          <p className="mt-4 font-serif text-2xl leading-snug text-ink-2">{j.summary}</p>
+          <p className="mt-4 text-lg leading-relaxed text-ink-2 sm:text-xl">{j.summary}</p>
           {j.companyUrl && (
             <a href={j.companyUrl} target="_blank" rel="noreferrer" className="mt-4 inline-block font-mono text-[12px] text-link hover:underline">
               {j.companyUrl.replace('https://', '')} ↗

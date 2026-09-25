@@ -68,7 +68,7 @@ export default function Resume() {
           <p className="label mb-3">
             <span className="text-accent">~/</span>resume
           </p>
-          <h1 className="text-5xl font-semibold tracking-[-0.04em] sm:text-7xl">
+          <h1 className="font-display text-5xl font-bold tracking-[-0.035em] sm:text-7xl">
             Resume<span className="text-accent">.</span>
           </h1>
         </div>
@@ -76,11 +76,11 @@ export default function Resume() {
           <a
             href={profile.cv}
             download={`${profile.cvName}.pdf`}
-            className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-accent"
+            className="inline-flex items-center gap-2 rounded-full bg-pop px-5 py-3 text-sm font-semibold text-pop-ink transition-transform hover:scale-[1.03]"
           >
             Download PDF ↓
           </a>
-          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-md border border-line px-5 py-3 text-sm font-medium transition-colors hover:border-ink/40">
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-medium transition-colors hover:bg-paper-2">
             Print
           </button>
         </div>
