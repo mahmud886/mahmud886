@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-label="Iqbal Mahmud — Software Engineer">
+  <title>Iqbal Mahmud — Software Engineer</title>
+  <defs>
+    <pattern id="g" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="rgba(236,235,230,0.05)"/></pattern>
+    <pattern id="G" width="96" height="96" patternUnits="userSpaceOnUse"><path d="M96 0H0V96" fill="none" stroke="rgba(236,235,230,0.08)"/></pattern>
+    <style>
+      .s { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+      .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
+      .f { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+      .ln { opacity: 0; animation: show .01s linear forwards; }
+      .type { transform: scaleX(0); transform-box: fill-box; transform-origin: left; animation: type .9s steps(14, end) forwards; }
+      .rise { opacity: 0; animation: rise .9s cubic-bezier(.2,.7,.2,1) forwards; }
+      .caret { animation: blink 1s steps(1) infinite; }
+      .dot { animation: pulse 2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      @keyframes show { to { opacity: 1; } }
+      @keyframes type { to { transform: scaleX(1); } }
+      @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+      @keyframes blink { 50% { opacity: 0; } }
+      @keyframes pulse { 50% { opacity: .35; } }
+      @media (prefers-reduced-motion: reduce) { .ln, .rise { opacity: 1; animation: none; } .type { transform: none; animation: none; } .caret, .dot { animation: none; } }
+    </style>
+  </defs>
+  <rect width="1280" height="360" rx="18" fill="#0d0e11"/>
+  <rect width="1280" height="360" rx="18" fill="url(#g)"/>
+  <rect width="1280" height="360" rx="18" fill="url(#G)"/>
+  <rect x=".5" y=".5" width="1279" height="359" rx="18" fill="none" stroke="rgba(236,235,230,0.12)"/>
+
+  <g class="rise" style="animation-delay:.05s">
+    <rect x="56" y="52" width="232" height="28" rx="14" fill="none" stroke="rgba(236,235,230,0.12)"/>
+    <circle class="dot" cx="74" cy="66" r="4.5" fill="#3ddc84"/>
+    <text x="88" y="70.5" class="m" font-size="12" fill="#c3c2bd">available for new work</text>
+  </g>
+  <text x="54" y="160" class="s rise" style="animation-delay:.15s" font-size="78" font-weight="700" letter-spacing="-3.5" fill="#ecebe6">Iqbal Mahmud</text>
+  <text x="56" y="214" class="f rise" style="animation-delay:.3s" font-size="31" fill="#c3c2bd">engineers interfaces that feel <tspan fill="#ff6a33">effortless</tspan></text>
+  <text x="56" y="252" class="f rise" style="animation-delay:.38s" font-size="31" fill="#c3c2bd">— and never slow.</text>
+  <g class="rise" style="animation-delay:.5s">
+    <line x1="56" y1="290" x2="660" y2="290" stroke="rgba(236,235,230,0.12)"/>
+    <text x="56" y="316" class="m" font-size="12.5" fill="#8b8a92">SOFTWARE ENGINEER  ·  REACT · NEXT.JS · TYPESCRIPT  ·  DHAKA, BD</text>
+  </g>
+
+  <g class="rise" style="animation-delay:.25s">
+    <rect x="760" y="56" width="468" height="248" rx="12" fill="#0d0e11" stroke="rgba(236,235,230,0.12)"/>
+    <path d="M760 68a12 12 0 0 1 12-12h444a12 12 0 0 1 12 12v24H760z" fill="#15161b"/>
+    <line x1="760" y1="92" x2="1228" y2="92" stroke="rgba(236,235,230,0.12)"/>
+    <circle cx="782" cy="74" r="5" fill="#ff5f57"/><circle cx="800" cy="74" r="5" fill="#febc2e"/><circle cx="818" cy="74" r="5" fill="#28c840"/>
+    <text x="838" y="78.5" class="m" font-size="11.5" fill="#8b8a92">iqbal@portfolio — zsh</text>
+    <path d="M752 48h10M752 48v10M1236 312h-10M1236 312v-10" stroke="#ecebe6" stroke-opacity=".45"/>
+  </g>
+  <g class="ln" style="animation-delay:0.4s"><text x="784" y="128" class="m"><tspan fill="#3ddc84">iqbal</tspan><tspan fill="#8b8a92"> ~ $ </tspan></text>
+  <clipPath id="c0"><rect class="type" x="866" y="114" height="20" width="52" style="animation-delay:0.4s"/></clipPath>
+  <text x="866" y="128" class="m" fill="#ecebe6" clip-path="url(#c0)">whoami</text></g><text x="784" y="154" class="m ln" style="animation-delay:1.6s" fill="#c3c2bd">software engineer · 7+ years · dhaka</text><g class="ln" style="animation-delay:2.4s"><text x="784" y="180" class="m"><tspan fill="#3ddc84">iqbal</tspan><tspan fill="#8b8a92"> ~ $ </tspan></text>
+  <clipPath id="c2"><rect class="type" x="866" y="166" height="20" width="94" style="animation-delay:2.4s"/></clipPath>
+  <text x="866" y="180" class="m" fill="#ecebe6" clip-path="url(#c2)">cat now.txt</text></g><text x="784" y="206" class="m ln" style="animation-delay:3.5s" fill="#c3c2bd">shipping UI at Adventure Dhaka Limited</text><g class="ln" style="animation-delay:4.3s"><text x="784" y="232" class="m"><tspan fill="#3ddc84">iqbal</tspan><tspan fill="#8b8a92"> ~ $ </tspan></text>
+  <clipPath id="c4"><rect class="type" x="866" y="218" height="20" width="111" style="animation-delay:4.3s"/></clipPath>
+  <text x="866" y="232" class="m" fill="#ecebe6" clip-path="url(#c4)">ls ~/projects</text></g><text x="784" y="258" class="m ln" style="animation-delay:5.3s" fill="#ff6a33">dev-visualize  sporefall  loud-spectrum</text>
+  <g class="ln" style="animation-delay:5.8s"><text x="784" y="284" class="m"><tspan fill="#3ddc84">iqbal</tspan><tspan fill="#8b8a92"> ~ $ </tspan></text><rect class="caret" x="867" y="270" width="8" height="17" fill="#ff6a33"/></g>
+</svg>
