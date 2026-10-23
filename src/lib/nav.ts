@@ -11,6 +11,7 @@ export const sections = [
 
 export const THEME_EVENT = 'theme:toggle';
 export const PALETTE_EVENT = 'palette:open';
+export const MENU_EVENT = 'menu:open';
 
 export function setTheme(next: 'light' | 'dark') {
   document.documentElement.dataset.theme = next;

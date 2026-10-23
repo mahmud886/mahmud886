@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { profile } from '@/lib/data';
 import { useMotion } from '@/lib/motion';
-import { PALETTE_EVENT, sections, THEME_EVENT, toggleTheme } from '@/lib/nav';
+import { MENU_EVENT, PALETTE_EVENT, sections, THEME_EVENT, toggleTheme } from '@/lib/nav';
 import LocalTime from './LocalTime';
 
 function subscribeTheme(cb: () => void) {
@@ -109,6 +109,8 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
+  // On the homepage the hero carries its own nav; this header waits until that has scrolled away.
+  const [heroNav, setHeroNav] = useState(false);
   const [mac, setMac] = useState(true);
   const { paused, toggle } = useMotion();
   const first = useRef<HTMLAnchorElement>(null);
@@ -118,6 +120,24 @@ export default function Header() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the platform is only known in the browser
     setMac(/Mac|iPhone|iPad/.test(navigator.platform));
+  }, []);
+
+  useEffect(() => {
+    const el = isHome ? document.getElementById('hero-nav') : null;
+    if (!el) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- no hero on this page
+      setHeroNav(false);
+      return;
+    }
+    const io = new IntersectionObserver(([e]) => setHeroNav(e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, [isHome]);
+
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    addEventListener(MENU_EVENT, onOpen);
+    return () => removeEventListener(MENU_EVENT, onOpen);
   }, []);
 
   // Scroll-spy: the section crossing the upper third of the viewport is "active".
@@ -196,7 +216,8 @@ export default function Header() {
   return (
     <>
       <header
-        className={`site-chrome fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-out-expo ${hidden && !open ? '-translate-y-[130%]' : ''}`}
+        className={`site-chrome fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-out-expo ${(hidden || heroNav) && !open ? '-translate-y-[130%]' : ''}`}
+        inert={heroNav && !open ? true : undefined}
       >
         <div className="flex h-[var(--hh)] items-center justify-between gap-3 px-[var(--pad)]">
           <div className={`${island} flex h-11 items-center px-4`}>

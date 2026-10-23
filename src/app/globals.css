@@ -222,6 +222,122 @@ body::after {
   line-height: 0.86;
 }
 
+/*
+ * The hero card: always dark, whatever the theme. Its corners are "carved" by .notch
+ * tabs in the page colour, each with two concave fillets so the card flows around them.
+ */
+.hero-card {
+  --paper: #0c0c0c;
+  --paper-2: #1a1a1a;
+  --ink: #f3f3f0;
+  --ink-2: #c8c8c4;
+  --muted: #8c8c88;
+  --line: rgba(243, 243, 240, 0.16);
+  background: var(--paper);
+  color: var(--ink);
+}
+[data-theme='dark'] .hero-card {
+  --paper: #1b1b1a;
+}
+
+.notch {
+  --nr: 28px;
+  position: absolute;
+  z-index: 2;
+  background: var(--paper);
+}
+.notch::before,
+.notch::after {
+  content: '';
+  position: absolute;
+  width: var(--nr);
+  height: var(--nr);
+  pointer-events: none;
+}
+.notch-tl {
+  top: 0;
+  left: 0;
+  border-bottom-right-radius: var(--nr);
+}
+.notch-tl::before,
+.notch-tl::after {
+  background: radial-gradient(circle at 100% 100%, transparent calc(var(--nr) - 0.5px), var(--paper) var(--nr));
+}
+.notch-tl::before {
+  top: 0;
+  left: 100%;
+}
+.notch-tl::after {
+  top: 100%;
+  left: 0;
+}
+.notch-tr {
+  top: 0;
+  right: 0;
+  border-bottom-left-radius: var(--nr);
+}
+.notch-tr::before,
+.notch-tr::after {
+  background: radial-gradient(circle at 0 100%, transparent calc(var(--nr) - 0.5px), var(--paper) var(--nr));
+}
+.notch-tr::before {
+  top: 0;
+  right: 100%;
+}
+.notch-tr::after {
+  top: 100%;
+  right: 0;
+}
+/* The bottom tabs are carved only on wide screens; on phones they sit below the card. */
+@media (min-width: 1024px) {
+  .notch-bl {
+    bottom: 0;
+    left: 0;
+    border-top-right-radius: var(--nr);
+  }
+  .notch-bl::before,
+  .notch-bl::after {
+    background: radial-gradient(circle at 100% 0, transparent calc(var(--nr) - 0.5px), var(--paper) var(--nr));
+  }
+  .notch-bl::before {
+    bottom: 100%;
+    left: 0;
+  }
+  .notch-bl::after {
+    bottom: 0;
+    left: 100%;
+  }
+  .notch-br {
+    bottom: 0;
+    right: 0;
+    border-top-left-radius: var(--nr);
+  }
+  .notch-br::before,
+  .notch-br::after {
+    background: radial-gradient(circle at 0 0, transparent calc(var(--nr) - 0.5px), var(--paper) var(--nr));
+  }
+  .notch-br::before {
+    bottom: 100%;
+    right: 0;
+  }
+  .notch-br::after {
+    bottom: 0;
+    right: 100%;
+  }
+}
+@media (max-width: 1023.98px) {
+  .notch-bl,
+  .notch-br {
+    position: static;
+  }
+  .notch-bl::before,
+  .notch-bl::after,
+  .notch-br::before,
+  .notch-br::after {
+    display: none;
+  }
+}
+
 /* The full stop that ends every chapter title. */
 .stop {
   font-family: var(--font-serif-face), Georgia, serif;
