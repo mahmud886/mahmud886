@@ -298,6 +298,18 @@ body::after {
   }
 }
 
+@keyframes menu-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes menu-item {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+
 @keyframes gallery-progress {
   from {
     transform: scaleX(0);
