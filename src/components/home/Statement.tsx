@@ -15,7 +15,7 @@ function RotatingWord() {
     return () => clearInterval(id);
   }, [paused]);
   return (
-    <span className="rotor serif-i">
+    <span className="rotor script text-[1.3em] font-normal leading-[0.9]">
       <span className="sr-only">{AUDIENCE.join(', ')}.</span>
       <span key={i} aria-hidden>
         {AUDIENCE[i]}.

@@ -202,9 +202,17 @@ body::after {
 }
 
 @utility serif-i {
-  font-family: var(--font-serif-face), Didot, Georgia, serif;
+  font-family: var(--font-serif-face), Georgia, serif;
   font-style: italic;
+  font-weight: 500;
+}
+
+/* The emphasised word: a calligraphic script, upright and unkerned so the letters join. */
+@utility script {
+  font-family: var(--font-script-face), cursive;
+  font-style: normal;
   font-weight: 400;
+  letter-spacing: 0;
 }
 
 @utility chapter {
@@ -216,9 +224,9 @@ body::after {
 
 /* The full stop that ends every chapter title. */
 .stop {
-  font-family: var(--font-serif-face), Didot, Georgia, serif;
+  font-family: var(--font-serif-face), Georgia, serif;
   font-style: italic;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0;
 }
 
@@ -258,6 +266,9 @@ body::after {
   display: inline-grid;
   overflow: hidden;
   vertical-align: bottom;
+  /* Room for script descenders and swashes inside the slide-up mask. */
+  padding: 0 0.12em 0.22em 0.08em;
+  margin: 0 -0.12em -0.22em -0.08em;
 }
 .rotor > span {
   animation: rotor-in 0.7s var(--ease-out-expo) both;

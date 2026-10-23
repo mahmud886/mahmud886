@@ -99,8 +99,8 @@ export default function Hero() {
       <Wordmark text={profile.lastName.toUpperCase()} />
 
       <div className="mt-[clamp(20px,3vw,44px)] grid items-end gap-8 border-t border-ink pt-[clamp(16px,2vw,28px)] lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-16">
-        <p className="serif-i text-[clamp(5rem,13vw,13.5rem)] leading-[0.78] tracking-[-0.04em]" data-reveal>
-          Hello<span className="not-italic">.</span>
+        <p className="script pl-[0.08em] pr-[0.1em] text-[clamp(6.5rem,17vw,17.5rem)] leading-[0.7]" data-reveal>
+          Hello.
         </p>
         <div className="max-w-[44ch] pb-[0.4em]" data-reveal style={{ ['--i' as string]: 1 }}>
           <p className="text-[clamp(1rem,1.25vw,1.2rem)] leading-relaxed text-ink-2">

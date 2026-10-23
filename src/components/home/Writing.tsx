@@ -12,7 +12,7 @@ export default async function Writing() {
     <section id="writing" aria-labelledby="writing-title" className="px-[var(--pad)] pb-[clamp(90px,12vw,190px)]">
       <div className="mb-[clamp(32px,5vw,72px)] flex flex-wrap items-end justify-between gap-6">
         <h2 id="writing-title" className="chapter">
-          Notes<span className="serif-i font-normal">, written down</span>
+          Notes, <span className="script text-[1.3em] font-normal">written down</span>
           <span className="stop">.</span>
         </h2>
         <a href={medium} target="_blank" rel="noreferrer" className="pill">

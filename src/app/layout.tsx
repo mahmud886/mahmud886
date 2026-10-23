@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Bodoni_Moda, Geist_Mono, Inter_Tight } from 'next/font/google';
+import { Allura, Cormorant_Garamond, Geist_Mono, Inter_Tight } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,7 +11,8 @@ import { profile } from '@/lib/data';
 
 const sans = Inter_Tight({ variable: '--font-sans-face', subsets: ['latin'] });
 const mono = Geist_Mono({ variable: '--font-mono-face', subsets: ['latin'] });
-const serif = Bodoni_Moda({ variable: '--font-serif-face', subsets: ['latin'], style: ['normal', 'italic'] });
+const serif = Cormorant_Garamond({ variable: '--font-serif-face', subsets: ['latin'], weight: ['400', '500'], style: ['normal', 'italic'] });
+const script = Allura({ variable: '--font-script-face', subsets: ['latin'], weight: '400' });
 
 const title = `${profile.name} — ${profile.role}`;
 
@@ -48,7 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: prePaint }} />
       </head>
-      <body className={`${sans.variable} ${mono.variable} ${serif.variable} min-h-svh antialiased`}>
+      <body className={`${sans.variable} ${mono.variable} ${serif.variable} ${script.variable} min-h-svh antialiased`}>
         <a
           href="#main"
           className="site-chrome fixed left-3 top-3 z-[80] -translate-y-20 rounded-full bg-ink px-4 py-2 text-sm text-paper focus:translate-y-0"

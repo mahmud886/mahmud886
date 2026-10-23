@@ -20,7 +20,7 @@ export default function Contact() {
       <h2 id="contact-title" className="text-[clamp(3.4rem,11vw,11.5rem)] font-extrabold leading-[0.84] tracking-[-0.065em]" data-reveal>
         Let’s build
         <br />
-        something <span className="serif-i font-normal tracking-[-0.04em]">good.</span>
+        something <span className="script text-[1.3em] font-normal">good.</span>
       </h2>
 
       <div className="mt-[clamp(40px,6vw,90px)] grid gap-8 border-t border-ink pt-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">

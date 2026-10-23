@@ -56,8 +56,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <p aria-hidden className="serif-i mt-10 select-none pb-[0.16em] text-[clamp(7rem,30vw,30rem)] leading-[0.8] tracking-[-0.05em]">
-        Bye<span className="not-italic">.</span>
+      <p aria-hidden className="script mt-10 select-none pb-[0.12em] text-[clamp(9rem,38vw,38rem)] leading-[0.75]">
+        Bye.
       </p>
 
       <div className="mt-6 flex flex-wrap justify-between gap-2 font-mono text-[11px] text-muted">
