@@ -20,6 +20,8 @@ try {
     '--headless=new',
     '--disable-gpu',
     '--no-pdf-header-footer',
+    // Chrome refuses to sandbox as root (CI containers); everywhere else keep the sandbox.
+    ...(process.getuid?.() === 0 ? ['--no-sandbox'] : []),
     '--virtual-time-budget=8000',
     `--print-to-pdf=${OUT}`,
     `http://localhost:${PORT}/resume`,

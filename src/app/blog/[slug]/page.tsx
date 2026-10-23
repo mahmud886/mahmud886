@@ -2,6 +2,7 @@ import { getMediumPostBySlug, fetchMediumPosts } from '@/lib/medium';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { clip } from '@/lib/seo';
 import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 
 export async function generateStaticParams() {
@@ -16,7 +17,23 @@ export const revalidate = 3600;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getMediumPostBySlug('mahmud886', slug);
-  return post ? { title: post.title, openGraph: { title: post.title, type: 'article', images: post.thumbnail ? [post.thumbnail] : undefined } } : {};
+  if (!post) return {};
+  const description = clip(post.content.replace(/<[^>]+>/g, ' '));
+  return {
+    title: post.title,
+    description,
+    // The original lives on Medium; point search engines there so this copy never competes with it.
+    alternates: { canonical: post.link.split('?')[0] },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description,
+      publishedTime: new Date(post.pubDate).toISOString(),
+      authors: [post.creator],
+      images: post.thumbnail ? [post.thumbnail] : undefined,
+    },
+    twitter: { card: 'summary_large_image', title: post.title, description },
+  };
 }
 
 export default async function BlogPost({ 
@@ -32,13 +49,13 @@ export default async function BlogPost({
   }
 
   return (
-    <article className="pb-24 pt-10 sm:pt-16">
+    <article className="pb-24 pt-[calc(var(--hh)+32px)]">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <Link 
-          href="/#blog" 
+          href="/#writing" 
           className="inline-flex items-center gap-2 mb-8 font-mono text-[12px] text-muted transition-colors hover:text-ink"
         >
-          <FiArrowLeft /> Back to Home
+          <FiArrowLeft /> All notes
         </Link>
         
         <header className="mb-12">
@@ -54,13 +71,13 @@ export default async function BlogPost({
             <span>By {post.creator}</span>
           </div>
           
-          <h1 className="mb-8 text-4xl font-semibold tracking-tight md:text-5xl">
+          <h1 className="mb-8 text-[clamp(2.4rem,5.5vw,4.5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]">
             {post.title}
           </h1>
 
-          <div className="flex items-center gap-4 pb-8 border-b border-line">
+          <div className="flex flex-wrap items-center gap-2 pb-8 border-b border-ink">
             {post.categories.map((category) => (
-              <span key={category} className="rounded border border-line px-2 py-0.5 font-mono text-[11px] text-ink-2">
+              <span key={category} className="pill h-7 cursor-default px-3 text-[10.5px]">
                 {category}
               </span>
             ))}
@@ -68,7 +85,7 @@ export default async function BlogPost({
         </header>
 
         <div 
-          className="prose max-w-none dark:prose-invert prose-headings:tracking-tight prose-img:rounded-2xl prose-img:border prose-img:border-line prose-video:rounded-2xl prose-a:text-link hover:prose-a:text-blue-300"
+          className="prose max-w-none dark:prose-invert prose-headings:tracking-tight prose-headings:font-bold prose-img:rounded-2xl prose-img:border prose-img:border-line prose-video:rounded-2xl prose-a:text-ink prose-a:underline-offset-4 hover:prose-a:opacity-70"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
         
@@ -77,7 +94,7 @@ export default async function BlogPost({
             href={post.link} 
             target="_blank" 
             rel="noreferrer"
-            className="flex items-center gap-2 font-mono text-[12px] text-link hover:underline"
+            className="pill"
           >
             Read original on Medium <FiExternalLink />
           </a>

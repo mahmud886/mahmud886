@@ -1,5 +1,8 @@
 export const sections = [
+  { id: 'products', label: 'SaaS' },
   { id: 'work', label: 'Work' },
+  { id: 'lab', label: 'Lab' },
+  { id: 'services', label: 'Services' },
   { id: 'experience', label: 'Experience' },
   { id: 'stack', label: 'Stack' },
   { id: 'writing', label: 'Writing' },
@@ -8,6 +11,7 @@ export const sections = [
 
 export const THEME_EVENT = 'theme:toggle';
 export const PALETTE_EVENT = 'palette:open';
+export const MENU_EVENT = 'menu:open';
 
 export function setTheme(next: 'light' | 'dark') {
   document.documentElement.dataset.theme = next;

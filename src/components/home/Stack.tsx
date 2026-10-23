@@ -1,93 +1,60 @@
 import { profile } from '@/lib/data';
-import SectionHead from './SectionHead';
 
-const level: Record<string, string> = {
-  Frontend: 'expert',
-  'Backend & API': 'proficient',
-  'DevOps & Tools': 'daily',
-};
-
-function Key({ children }: { children: string }) {
-  return <span className="text-[var(--code-key)]">&quot;{children}&quot;</span>;
-}
-function Str({ children }: { children: string }) {
-  return <span className="text-[var(--code-str)]">&quot;{children}&quot;</span>;
+function Row({ items, dir, dur }: { items: string[]; dir: 'left' | 'right'; dur: string }) {
+  const run = (copy: number) =>
+    items.map((t) => (
+      <span key={`${copy}-${t}`} className="flex items-center gap-[0.35em] pr-[0.35em]">
+        {t}
+        <span className="text-[0.4em]">●</span>
+      </span>
+    ));
+  return (
+    <div className="marquee-wrap overflow-hidden" aria-hidden>
+      <div className="marquee" data-dir={dir} style={{ ['--dur' as string]: dur }}>
+        <div className="flex">{run(0)}</div>
+        <div className="flex">{run(1)}</div>
+      </div>
+    </div>
+  );
 }
 
 export default function Stack() {
   const groups = Object.entries(profile.skills);
+  const all = groups.flatMap(([, v]) => v);
+  const half = Math.ceil(all.length / 2);
   return (
-    <section id="stack" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28">
-      <SectionHead n="03" label="Stack & approach" title={<>Boring where it should be, <span className="font-serif font-normal italic text-accent">delightful</span> where it counts.</>} />
-
-      <div className="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
-        <div>
-          <div className="label mb-5">How I work</div>
-          <ol className="space-y-6">
-            {profile.process.map((s, i) => (
-              <li key={s.step} data-reveal style={{ ['--i' as string]: i }} className="grid grid-cols-[44px_1fr] gap-3">
-                <span className="font-mono text-sm text-accent">0{i + 1}.</span>
-                <div>
-                  <h3 className="text-lg font-semibold">{s.step}</h3>
-                  <p className="mt-1 text-[15px] leading-relaxed text-ink-2">{s.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-
-          <div className="label mb-4 mt-12">What I can own</div>
-          <div data-reveal className="grid gap-px overflow-hidden rounded-[14px] border border-line bg-line sm:grid-cols-2">
-            {profile.services.map((s) => (
-              <div key={s.title} className="bg-paper p-5">
-                <div className="font-semibold">{s.title}</div>
-                <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-2">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div data-reveal className="lg:sticky lg:top-24 lg:self-start">
-          <div className="card ticks overflow-hidden">
-            <div className="flex items-center justify-between border-b border-line bg-paper-2 px-4 py-2 font-mono text-[11px] text-muted">
-              <span>package.json</span>
-              <span>{groups.reduce((n, [, v]) => n + v.length, 0)} dependencies</span>
-            </div>
-            <pre className="overflow-x-auto p-5 font-mono text-[12.5px] leading-[1.75]">
-              <code>
-                {'{\n'}
-                {'  '}
-                <Key>name</Key>: <Str>iqbal-mahmud</Str>,{'\n'}
-                {'  '}
-                <Key>version</Key>: <Str>{`${profile.years}.0.0`}</Str>,{'\n'}
-                {'  '}
-                <Key>role</Key>: <Str>{profile.role.toLowerCase()}</Str>,{'\n'}
-                {groups.map(([group, items], gi) => (
-                  <span key={group}>
-                    {'  '}
-                    <span className="text-[var(--code-com)]">{`// ${group}`}</span>
-                    {'\n  '}
-                    <Key>{group.toLowerCase().replace(/[^a-z]+/g, '_')}</Key>
-                    {': {\n'}
-                    {items.map((s, i) => (
-                      <span key={s}>
-                        {'    '}
-                        <Key>{s}</Key>: <Str>{level[group] ?? 'daily'}</Str>
-                        {i < items.length - 1 ? ',' : ''}
-                        {'\n'}
-                      </span>
-                    ))}
-                    {'  }'}
-                    {gi < groups.length - 1 ? ',' : ''}
-                    {'\n'}
-                  </span>
-                ))}
-                {'}'}
-              </code>
-            </pre>
-          </div>
-          <p className="mt-3 font-mono text-[11px] text-muted">Levels are honest: “expert” is what I ship with every week.</p>
-        </div>
+    <section id="stack" aria-labelledby="stack-title" className="py-[clamp(90px,12vw,190px)]">
+      <div className="mb-[clamp(32px,5vw,72px)] flex flex-wrap items-end justify-between gap-6 px-[var(--pad)]">
+        <h2 id="stack-title" className="chapter">
+          The stack<span className="stop">.</span>
+        </h2>
+        <p className="max-w-[34ch] text-[15px] leading-snug text-ink-2">What I reach for, every day. Hover a row to hold it still.</p>
       </div>
+
+      <div className="space-y-1 border-y border-ink py-4 text-[clamp(2.6rem,7vw,6.5rem)] font-extrabold uppercase leading-[1] tracking-[-0.05em]">
+        <Row items={all.slice(0, half)} dir="left" dur="48s" />
+        <Row items={all.slice(half)} dir="right" dur="56s" />
+      </div>
+
+      <div className="mt-[clamp(40px,5vw,80px)] grid gap-10 px-[var(--pad)] md:grid-cols-3">
+        {groups.map(([name, items], i) => (
+          <div key={name} data-reveal style={{ ['--i' as string]: i }}>
+            <h3 className="flex items-baseline justify-between border-b border-ink pb-2">
+              <span className="text-[1.35rem] font-bold tracking-[-0.03em]">{name}</span>
+              <span className="label">{String(items.length).padStart(2, '0')}</span>
+            </h3>
+            <ul className="divide-y divide-line">
+              {items.map((s) => (
+                <li key={s} className="flex justify-between py-2.5 text-[15px]">
+                  {s}
+                  <span className="font-mono text-[11px] text-muted">↗</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <p className="sr-only">Skills: {all.join(', ')}.</p>
     </section>
   );
 }

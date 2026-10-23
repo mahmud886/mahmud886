@@ -1,33 +1,44 @@
 import Link from 'next/link';
 import { fetchMediumPosts } from '@/lib/medium';
 import { profile } from '@/lib/data';
-import SectionHead from './SectionHead';
+
+const fmt = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
 export default async function Writing() {
-  const posts = (await fetchMediumPosts('mahmud886')).slice(0, 5);
+  const posts = (await fetchMediumPosts('mahmud886')).slice(0, 6);
   if (!posts.length) return null;
   const medium = profile.socials.find((s) => s.label === 'Medium')!.href;
   return (
-    <section id="writing" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 sm:py-28">
-      <SectionHead n="04" label="Writing" title={<>Notes, <span className="font-serif font-normal italic text-accent">written down.</span></>}>
-        Interview prep, JavaScript deep-dives and things I learned the hard way — on Medium.
-      </SectionHead>
-      <ul className="card divide-y divide-line">
-        {posts.map((p) => (
-          <li key={p.slug} data-reveal>
-            <Link href={`/blog/${p.slug}`} className="group grid gap-1 px-5 py-4 sm:grid-cols-[120px_1fr_auto] sm:items-center sm:gap-6">
-              <time className="font-mono text-[11px] text-muted" dateTime={p.pubDate}>
-                {new Date(p.pubDate).toISOString().slice(0, 10)}
+    <section id="writing" aria-labelledby="writing-title" className="px-[var(--pad)] pb-[clamp(90px,12vw,190px)]">
+      <div className="mb-[clamp(32px,5vw,72px)] flex flex-wrap items-end justify-between gap-6">
+        <h2 id="writing-title" className="chapter">
+          Notes, <span className="script text-[1.3em] font-normal">written down</span>
+          <span className="stop">.</span>
+        </h2>
+        <a href={medium} target="_blank" rel="noreferrer" className="pill">
+          All posts on Medium ↗
+        </a>
+      </div>
+      <ol className="border-t border-ink">
+        {posts.map((p, i) => (
+          <li key={p.slug} className="index-row border-b border-line" data-reveal style={{ ['--i' as string]: i }}>
+            <Link
+              href={`/blog/${p.slug}`}
+              data-cursor="Read"
+              className="grid gap-x-6 gap-y-1 px-1 py-5 md:grid-cols-[140px_minmax(0,1fr)_minmax(0,0.5fr)_24px] md:items-baseline"
+            >
+              <time className="index-muted font-mono text-[11px] uppercase tracking-[0.1em] text-muted" dateTime={p.pubDate}>
+                {fmt.format(new Date(p.pubDate))}
               </time>
-              <span className="font-medium leading-snug transition-colors group-hover:text-accent">{p.title}</span>
-              <span className="hidden font-mono text-xs text-muted transition-transform group-hover:translate-x-1 sm:block">→</span>
+              <span className="text-[clamp(1.25rem,2.1vw,1.9rem)] font-semibold leading-[1.1] tracking-[-0.035em]">{p.title}</span>
+              <span className="index-muted hidden truncate font-mono text-[11px] text-muted md:block">{p.categories.slice(0, 3).join(' · ')}</span>
+              <span aria-hidden className="hidden text-xl md:block">
+                →
+              </span>
             </Link>
           </li>
         ))}
-      </ul>
-      <a href={medium} target="_blank" rel="noreferrer" className="mt-4 inline-block font-mono text-[12px] text-link hover:underline">
-        All posts on Medium ↗
-      </a>
+      </ol>
     </section>
   );
 }
