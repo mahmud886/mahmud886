@@ -4,32 +4,43 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CommandPalette from '@/components/CommandPalette';
-import RevealObserver from '@/components/RevealObserver';
 import Cursor from '@/components/Cursor';
 import ScrollProgress from '@/components/ScrollProgress';
 import { profile } from '@/lib/data';
+import { KEYWORDS, SITE_DESCRIPTION, SITE_TITLE } from '@/lib/seo';
 
 const sans = Inter_Tight({ variable: '--font-sans-face', subsets: ['latin'] });
 const mono = Geist_Mono({ variable: '--font-mono-face', subsets: ['latin'] });
 const serif = Cormorant_Garamond({ variable: '--font-serif-face', subsets: ['latin'], weight: ['400', '500'], style: ['normal', 'italic'] });
 const script = Allura({ variable: '--font-script-face', subsets: ['latin'], weight: '400' });
 
-const title = `${profile.name} — ${profile.role}`;
-
+// Share images come from the opengraph-image / twitter-image files beside each page.
 export const metadata: Metadata = {
   metadataBase: new URL(profile.site),
-  title: { default: title, template: `%s — ${profile.name}` },
-  description: profile.intro,
-  authors: [{ name: profile.name }],
-  openGraph: {
-    title,
-    description: profile.intro,
-    url: profile.site,
-    siteName: profile.name,
-    images: [{ url: profile.photo, alt: profile.name }],
-    type: 'website',
+  title: { default: SITE_TITLE, template: `%s — ${profile.name}` },
+  description: SITE_DESCRIPTION,
+  applicationName: profile.name,
+  keywords: KEYWORDS,
+  authors: [{ name: profile.fullName, url: profile.site }],
+  creator: profile.fullName,
+  publisher: profile.fullName,
+  category: 'technology',
+  alternates: { canonical: '/' },
+  formatDetection: { telephone: false, email: false, address: false },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
   },
-  twitter: { card: 'summary_large_image', title, description: profile.intro, images: [profile.photo] },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    siteName: `${profile.name} — Portfolio`,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: { card: 'summary_large_image', title: SITE_TITLE, description: SITE_DESCRIPTION },
 };
 
 export const viewport: Viewport = {
@@ -62,7 +73,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Footer />
         <CommandPalette />
         <Cursor />
-        <RevealObserver />
       </body>
     </html>
   );

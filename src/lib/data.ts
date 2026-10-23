@@ -18,13 +18,16 @@ export const profile = {
   tagline: 'I engineer fast, cinematic web experiences.',
   intro:
     'Software Engineer building SaaS products and high-performance web applications with Next.js, React and TypeScript — multi-tenant under the hood, beautifully animated on the surface.',
+  headline: 'Software Engineer — Frontend & SaaS Product Engineering',
   summary:
-    'Dedicated Software Engineer with 7+ years of experience across front-end and back-end development. Specialised in React, Next.js and TypeScript, building scalable, high-performance and beautifully animated interfaces. Skilled in writing clean, maintainable, DRY code that speeds up delivery and minimises debugging time. Passionate about continuous learning and staying current with technology.',
+    'Software Engineer with 7+ years building production web applications in React, Next.js and TypeScript — from a UI serving 2M+ daily users to multi-tenant SaaS products I design and ship end to end. I own the frontend architecture, design systems, performance budgets and motion, and work full-stack with Node.js, PostgreSQL, Prisma and Supabase. Known for measurable results: 25–30% faster interfaces, 62% less debugging time and sub-second LCP in production.',
   skillsResume: {
-    Expertise: ['HTML', 'CSS', 'SCSS', 'Bootstrap', 'Tailwind CSS', 'JavaScript (ES6+)', 'React.js', 'Next.js', 'Redux Toolkit'],
-    Comfortable: ['TypeScript', 'Node.js', 'Express.js', 'MongoDB', 'MySQL', 'Supabase'],
-    'Motion & 3D': ['GSAP', 'Framer Motion', 'Three.js / R3F'],
-    'Quality & Tooling': ['Jest', 'React Testing Library', 'Cypress', 'Storybook', 'Git / GitHub / GitLab', 'CI/CD', 'Scrum'],
+    Programming: ['TypeScript', 'JavaScript (ES6+)', 'HTML5', 'CSS3', 'SCSS', 'SQL'],
+    Frontend: ['React', 'Next.js (App Router, SSR, RSC)', 'Redux Toolkit', 'Zustand', 'React Hook Form', 'Zod', 'Tailwind CSS', 'Styled Components', 'Radix UI', 'shadcn/ui', 'Storybook', 'Angular'],
+    'Backend & Data': ['Node.js', 'Express', 'REST APIs', 'PostgreSQL', 'Prisma', 'Supabase (Auth, RLS)', 'MongoDB', 'MySQL', 'Stripe', 'Laravel'],
+    'Motion & UI': ['GSAP', 'Framer Motion', 'Three.js / R3F', 'Design Systems', 'Responsive Design', 'Accessibility (WCAG)', 'i18n & RTL'],
+    'Testing & Delivery': ['Jest', 'React Testing Library', 'Cypress', 'Vitest', 'Playwright', 'Git', 'GitHub Actions', 'CI/CD', 'Vercel', 'Docker', 'Agile / Scrum'],
+    Languages: ['Bengali (native)', 'English (professional working proficiency)'],
   } as Record<string, string[]>,
   manifesto:
     'I turn complex ideas into interfaces that feel alive. Pixel-precise, performance-obsessed, and animated with intent — because the web should feel like magic, not machinery.',
@@ -644,3 +647,38 @@ export type Project = CaseStudy;
 /** Company name without the legal suffix, for big display type. */
 export const shortCompany = (company: string) => company.replace(/ (Pvt\. )?Ltd\.?$| Limited$/, '');
 export type Job = (typeof experience)[number];
+
+/** Projects on the resume, in order, with bullets written for recruiters and ATS keyword matching. */
+export const resumeProjects: { slug: string; bullets: string[] }[] = [
+  {
+    slug: 'parts-pilot',
+    bullets: [
+      'Designed and built a multi-tenant SaaS ERP for automotive parts retailers: counter POS, inventory, purchasing, garage job board and an online marketplace on one real-time stock ledger.',
+      'Shipped 35 admin screens in 5 locales (incl. Bangla and RTL Arabic) with 5 currencies, split-tender payments (bKash, Nagad), courier integrations and SaaS billing — 380+ commits in 4 weeks.',
+    ],
+  },
+  {
+    slug: 'restaurant-os',
+    bullets: [
+      'Built a multi-tenant restaurant platform of six connected apps — guest QR ordering, owner dashboard, POS, kitchen display, waiter and rider apps — plus a platform console for tenants, subscriptions and support, backed by 18 written technical specs.',
+    ],
+  },
+  {
+    slug: 'purecart',
+    bullets: [
+      'Built a white-label e-commerce platform for electronics retail — bilingual storefront with EMI, trade-in valuation and IMEI checks, and a 17-module merchant admin — rebrandable from one config with 7 live themes.',
+    ],
+  },
+  {
+    slug: 'sporefall',
+    bullets: [
+      'Led frontend for a Gen-AI micro-drama platform in Singapore: episode viewing, audience voting, Stripe merch store, an internal CMS (Tiptap, Recharts) and NEXUS, a drag-and-drop campaign builder shipped as one embed.js.',
+    ],
+  },
+  {
+    slug: 'loud-spectrum',
+    bullets: [
+      'Built a production B2B/B2C storefront for a US terpene manufacturer with accounts, dynamic pricing rules and a Storybook design system; achieved sub-second LCP through SSR, image and caching strategy.',
+    ],
+  },
+];

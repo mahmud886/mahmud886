@@ -2,6 +2,7 @@ import { getMediumPostBySlug, fetchMediumPosts } from '@/lib/medium';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { clip } from '@/lib/seo';
 import { FiArrowLeft, FiExternalLink } from 'react-icons/fi';
 
 export async function generateStaticParams() {
@@ -16,7 +17,23 @@ export const revalidate = 3600;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getMediumPostBySlug('mahmud886', slug);
-  return post ? { title: post.title, openGraph: { title: post.title, type: 'article', images: post.thumbnail ? [post.thumbnail] : undefined } } : {};
+  if (!post) return {};
+  const description = clip(post.content.replace(/<[^>]+>/g, ' '));
+  return {
+    title: post.title,
+    description,
+    // The original lives on Medium; point search engines there so this copy never competes with it.
+    alternates: { canonical: post.link.split('?')[0] },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description,
+      publishedTime: new Date(post.pubDate).toISOString(),
+      authors: [post.creator],
+      images: post.thumbnail ? [post.thumbnail] : undefined,
+    },
+    twitter: { card: 'summary_large_image', title: post.title, description },
+  };
 }
 
 export default async function BlogPost({ 

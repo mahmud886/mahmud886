@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { caseStudies } from '@/lib/data';
+import { clip, projectSchema } from '@/lib/seo';
+import JsonLd from '@/components/JsonLd';
 import ScreenGallery from '@/components/ScreenGallery';
 
 export function generateStaticParams() {
@@ -13,10 +15,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const p = caseStudies.find((x) => x.slug === slug);
   if (!p) return {};
+  const title = `${p.title} — ${p.kind}`;
+  const description = clip(`${p.tagline} ${p.description}`);
   return {
-    title: `${p.title} — Case study`,
-    description: p.overview,
-    openGraph: { title: `${p.title} — Case study`, description: p.overview, images: [{ url: p.screens[0].src, alt: p.title }] },
+    title,
+    description,
+    keywords: [p.title, p.kind, ...p.tags, ...p.stack],
+    alternates: { canonical: `/projects/${p.slug}` },
+    openGraph: { type: 'article', url: `/projects/${p.slug}`, title, description },
+    twitter: { card: 'summary_large_image', title, description },
   };
 }
 
@@ -47,6 +54,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="px-[var(--pad)] pb-[clamp(80px,10vw,160px)] pt-[calc(var(--hh)+24px)]">
+      <JsonLd data={projectSchema(p)} />
       <nav data-reveal className="label flex flex-wrap gap-2" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">
           Home

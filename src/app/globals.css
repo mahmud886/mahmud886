@@ -29,7 +29,7 @@
   --paper-2: #e8e8e4;
   --ink: #0c0c0c;
   --ink-2: #3a3a38;
-  --muted: #7b7b77;
+  --muted: #63635f;
   --line: rgba(12, 12, 12, 0.14);
   --inv-paper: #0c0c0c;
   --inv-paper-2: #181818;
@@ -58,7 +58,7 @@
   --inv-paper-2: #e2e2de;
   --inv-ink: #0b0b0b;
   --inv-ink-2: #3a3a38;
-  --inv-muted: #74746f;
+  --inv-muted: #5f5f5b;
   --inv-line: rgba(11, 11, 11, 0.16);
   --grain-blend: screen;
   --grain-opacity: 0.05;
@@ -497,18 +497,23 @@ body::after {
   filter: grayscale(0);
 }
 
-/* Reveal-on-scroll, driven by an IntersectionObserver that adds .in */
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.9s var(--ease-out-expo),
-    transform 0.9s var(--ease-out-expo);
-  transition-delay: calc(var(--i, 0) * 80ms);
+/*
+ * Reveal-on-scroll in pure CSS: a scroll-driven animation tied to each element's entry
+ * into view. Nothing waits for JavaScript, so content above the fold paints at once (LCP),
+ * and browsers without scroll timelines simply show everything.
+ */
+@supports (animation-timeline: view()) {
+  [data-reveal] {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry calc(var(--i, 0) * 4%) entry calc(55% + var(--i, 0) * 4%);
+  }
 }
-[data-reveal].in {
-  opacity: 1;
-  transform: none;
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
 }
 
 /* Pause: stop every CSS loop. JS-driven motion reads the same flag. */
@@ -519,9 +524,7 @@ body::after {
 
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] {
-    opacity: 1;
-    transform: none;
-    transition: none;
+    animation: none !important;
   }
   .wordmark > span,
   .rotor > span,
@@ -558,7 +561,7 @@ body::after {
     display: none !important;
   }
   .resume-sheet header {
-    display: flex !important;
+    display: block !important;
   }
   .resume-page {
     padding: 0 !important;
@@ -577,6 +580,24 @@ body::after {
   }
   .resume-avoid-break {
     break-inside: avoid;
+  }
+  /* Tighter rhythm on paper (and a hair smaller, ~9pt body) so it fits two A4 pages. */
+  .resume-sheet {
+    zoom: 0.95;
+  }
+  .resume-sheet section {
+    margin-top: 0.9rem !important;
+  }
+  .resume-sheet li,
+  .resume-sheet p,
+  .resume-sheet dl {
+    line-height: 1.42 !important;
+  }
+  .resume-sheet ul {
+    margin-top: 0.25rem !important;
+  }
+  .resume-sheet ul > li + li {
+    margin-top: 0.15rem !important;
   }
   * {
     -webkit-print-color-adjust: exact;

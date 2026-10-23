@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { experience, shortCompany } from '@/lib/data';
+import { clip, jobSchema } from '@/lib/seo';
+import JsonLd from '@/components/JsonLd';
 
 export function generateStaticParams() {
   return experience.map((j) => ({ slug: j.slug }));
@@ -10,7 +12,16 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const j = experience.find((x) => x.slug === slug);
-  return j ? { title: `${j.role} at ${j.company}`, description: j.summary } : {};
+  if (!j) return {};
+  const title = `${j.role} at ${j.company}`;
+  const description = clip(`${j.summary} ${j.period}. ${j.tech.join(', ')}.`);
+  return {
+    title,
+    description,
+    alternates: { canonical: `/work/${j.slug}` },
+    openGraph: { type: 'article', url: `/work/${j.slug}`, title, description },
+    twitter: { card: 'summary_large_image', title, description },
+  };
 }
 
 export default async function WorkPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -24,6 +35,7 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
 
   return (
     <main className="px-[var(--pad)] pb-[clamp(80px,10vw,160px)] pt-[calc(var(--hh)+24px)]">
+      <JsonLd data={jobSchema(j.slug)} />
       <nav data-reveal className="label flex gap-2" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">
           Home

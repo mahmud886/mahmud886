@@ -12,6 +12,8 @@ import Stack from '@/components/home/Stack';
 import Writing from '@/components/home/Writing';
 import Contact from '@/components/home/Contact';
 import { profile } from '@/lib/data';
+import { homeSchema } from '@/lib/seo';
+import JsonLd from '@/components/JsonLd';
 
 // Medium feed is re-fetched at most hourly; the page itself stays static.
 export const revalidate = 3600;
@@ -19,6 +21,7 @@ export const revalidate = 3600;
 export default function Home() {
   return (
     <main>
+      <JsonLd data={homeSchema()} />
       <Hero />
       <Products />
       <Halftone caption={`${profile.years}+ years of interfaces that move. Point at the dots.`} />

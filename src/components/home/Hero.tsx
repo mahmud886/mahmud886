@@ -82,7 +82,7 @@ export default function Hero() {
   return (
     <section id="hero" aria-label="Introduction" className="px-[var(--pad)] pt-[var(--pad)]">
       <h1 className="sr-only">
-        {profile.name} — {profile.role}
+        {profile.name} — {profile.role} building SaaS products with React, Next.js and TypeScript
       </h1>
       <div className="relative lg:h-[clamp(680px,calc(100svh-2*var(--pad)),920px)]">
         {/* The card */}
