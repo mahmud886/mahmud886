@@ -141,7 +141,7 @@ export default function CommandPalette() {
                 }}
                 onKeyDown={onKeyDown}
                 placeholder="Jump to a section, project, or action…"
-                className="h-12 w-full bg-transparent font-mono text-sm outline-none placeholder:text-muted"
+                className="h-12 w-full bg-transparent font-mono text-sm outline-none placeholder:text-muted focus-visible:outline-none"
                 aria-controls="palette-list"
                 aria-activedescendant={`palette-${index}`}
               />

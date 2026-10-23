@@ -62,25 +62,23 @@ export default function Resume() {
   );
 
   return (
-    <main ref={root} className="resume-page relative z-10 px-3 pb-24 pt-10 sm:px-8 sm:pt-16">
+    <main ref={root} className="resume-page relative z-10 px-3 pb-24 pt-[calc(var(--hh)+32px)] sm:px-8">
       <div data-resume-top className="resume-chrome mx-auto mb-8 flex max-w-[860px] flex-col gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="label mb-3">
-            <span className="text-accent">~/</span>resume
-          </p>
-          <h1 className="text-5xl font-semibold tracking-[-0.04em] sm:text-7xl">
-            Resume<span className="text-accent">.</span>
+          <p className="label mb-3">{profile.years}+ years · one page</p>
+          <h1 className="text-[clamp(3.4rem,9vw,7rem)] font-extrabold leading-[0.85] tracking-[-0.065em]">
+            Resume<span className="stop">.</span>
           </h1>
         </div>
         <div className="flex flex-wrap gap-3">
           <a
             href={profile.cv}
             download={`${profile.cvName}.pdf`}
-            className="inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper transition-colors hover:bg-accent"
+            className="pill-solid"
           >
             Download PDF ↓
           </a>
-          <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-md border border-line px-5 py-3 text-sm font-medium transition-colors hover:border-ink/40">
+          <button onClick={() => window.print()} className="pill h-12 px-6">
             Print
           </button>
         </div>

@@ -2,55 +2,102 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { profile } from '@/lib/data';
+import { useMotion } from '@/lib/motion';
 import { PALETTE_EVENT, sections, THEME_EVENT, toggleTheme } from '@/lib/nav';
 
-function ThemeIcon() {
-  const [dark, setDark] = useState(false);
-  useEffect(() => {
-    const sync = () => setDark(document.documentElement.dataset.theme === 'dark');
-    sync();
-    window.addEventListener(THEME_EVENT, sync);
-    return () => window.removeEventListener(THEME_EVENT, sync);
-  }, []);
+const TICKER = [
+  'Open to new roles & freelance work',
+  'React · Next.js · TypeScript · GSAP',
+  'Based in Dhaka, shipping worldwide',
+  `${profile.years}+ years building for the web`,
+];
+
+function subscribeTheme(cb: () => void) {
+  window.addEventListener(THEME_EVENT, cb);
+  return () => window.removeEventListener(THEME_EVENT, cb);
+}
+
+/** "Light" or "Dark": the mode you are in. Neutral until the pre-paint answer is read. */
+function useThemeName() {
+  return useSyncExternalStore(subscribeTheme, () => document.documentElement.dataset.theme ?? 'light', () => '');
+}
+
+export function ThemePill({ className = '' }: { className?: string }) {
+  const theme = useThemeName();
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
-      {dark ? (
-        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
-      ) : (
-        <>
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-        </>
-      )}
-    </svg>
+    <button type="button" onClick={toggleTheme} className={`pill ${className}`} aria-label="Toggle dark mode">
+      <span aria-hidden className="h-2.5 w-2.5 rounded-full border border-current bg-[linear-gradient(90deg,currentColor_50%,transparent_50%)]" />
+      <span suppressHydrationWarning>{theme === 'dark' ? 'Dark' : theme === 'light' ? 'Light' : 'Mode'}</span>
+    </button>
+  );
+}
+
+export function MotionPill({ className = '' }: { className?: string }) {
+  const { paused, toggle } = useMotion();
+  return (
+    <button type="button" onClick={toggle} className={`pill ${className}`} aria-pressed={paused} aria-label={paused ? 'Play motion' : 'Pause motion'}>
+      <span aria-hidden className="flex h-2.5 w-2.5 items-center justify-center gap-[2px]">
+        {paused ? (
+          <span className="h-0 w-0 border-y-[5px] border-l-[8px] border-y-transparent border-l-current" />
+        ) : (
+          <>
+            <span className="h-2.5 w-[3px] bg-current" />
+            <span className="h-2.5 w-[3px] bg-current" />
+          </>
+        )}
+      </span>
+      <span suppressHydrationWarning>{paused ? 'Play' : 'Pause'}</span>
+    </button>
+  );
+}
+
+function Ticker() {
+  const { paused } = useMotion();
+  const [i, setI] = useState(0);
+  const [hold, setHold] = useState(false);
+  useEffect(() => {
+    if (paused || hold) return;
+    const id = setInterval(() => setI((n) => (n + 1) % TICKER.length), 3600);
+    return () => clearInterval(id);
+  }, [paused, hold]);
+  return (
+    <div className="ticker text-[13px] font-medium tracking-tight" onPointerEnter={() => setHold(true)} onPointerLeave={() => setHold(false)}>
+      {TICKER.map((t, k) => (
+        <span key={t} data-on={k === i} aria-hidden={k !== i}>
+          {t}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+export function Logo({ className = '' }: { className?: string }) {
+  return (
+    <Link href="/" className={`group flex items-center gap-2 text-[15px] font-extrabold uppercase tracking-[-0.03em] ${className}`} aria-label={`${profile.name}, home`}>
+      <span aria-hidden className="h-3.5 w-3.5 rounded-full bg-current transition-transform duration-500 group-hover:scale-[0.6]" />
+      <span>
+        {profile.firstName}
+        <span className="font-medium"> {profile.lastName}</span>
+      </span>
+    </Link>
   );
 }
 
 export default function Header() {
   const pathname = usePathname();
   const isHome = pathname === '/';
+  const [open, setOpen] = useState(false);
+  const first = useRef<HTMLAnchorElement>(null);
   const [active, setActive] = useState<string | null>(null);
-  const [scrolled, setScrolled] = useState(false);
-  const [mac, setMac] = useState(true);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- platform is only known in the browser
-    setMac(/Mac|iPhone|iPad/.test(navigator.platform));
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   // Scroll-spy: the section crossing the upper third of the viewport is "active".
   useEffect(() => {
     if (!isHome) return;
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
-      { rootMargin: '-30% 0px -65% 0px' }
-    );
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)), {
+      rootMargin: '-30% 0px -65% 0px',
+    });
     sections.forEach((s) => {
       const el = document.getElementById(s.id);
       if (el) io.observe(el);
@@ -58,72 +105,101 @@ export default function Header() {
     return () => io.disconnect();
   }, [isHome]);
 
+  useEffect(() => {
+    if (!open) return;
+    const html = document.documentElement;
+    html.style.overflow = 'hidden';
+    first.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    addEventListener('keydown', onKey);
+    return () => {
+      html.style.overflow = '';
+      removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const href = (id: string) => (isHome ? `#${id}` : `/#${id}`);
+  const primary = sections.slice(0, 3);
+  const secondary = sections.slice(3);
+
   return (
-    <header
-      className={`sticky top-0 z-40 border-b transition-colors duration-300 ${
-        scrolled ? 'border-line bg-paper/85 backdrop-blur-md' : 'border-transparent'
-      }`}
-    >
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="group flex items-center gap-2 font-mono text-[13px]">
-          <span className="grid h-7 w-7 place-items-center rounded-md bg-ink text-[11px] font-semibold text-paper transition-colors group-hover:bg-accent">
-            IM
-          </span>
-          <span className="hidden sm:inline">
-            <span className="text-muted">~/</span>
-            {profile.lastName.toLowerCase()}
-            <span className="caret" />
-          </span>
-        </Link>
+    <>
+      <header className="blend-chrome fixed inset-x-0 top-0 z-50">
+        <div className="flex h-[var(--hh)] items-center justify-between gap-4 px-[var(--pad)]">
+          <div className="flex items-center gap-6">
+            <Logo />
+            <nav aria-label="Sections" className="hidden items-center gap-1.5 lg:flex">
+              {primary.map((s) => (
+                <Link key={s.id} href={href(s.id)} className="pill" aria-current={isHome && active === s.id ? 'location' : undefined}>
+                  {s.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Sections">
-          {sections.map((s) => {
-            const on = isHome && active === s.id;
-            return (
-              <Link
-                key={s.id}
-                href={isHome ? `#${s.id}` : `/#${s.id}`}
-                aria-current={on ? 'location' : undefined}
-                className={`relative rounded-md px-3 py-1.5 font-mono text-[12px] transition-colors ${
-                  on ? 'text-ink' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {on && <span className="absolute inset-x-3 -bottom-[13px] h-[2px] bg-accent" />}
-                {s.label.toLowerCase()}
-              </Link>
-            );
-          })}
-          <Link
-            href="/resume"
-            className={`rounded-md px-3 py-1.5 font-mono text-[12px] transition-colors ${pathname === '/resume' ? 'text-ink' : 'text-muted hover:text-ink'}`}
-          >
-            resume
-          </Link>
-        </nav>
+          <div className="hidden min-w-0 2xl:block">
+            <Ticker />
+          </div>
 
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => window.dispatchEvent(new Event(PALETTE_EVENT))}
-            className="flex h-8 items-center gap-2 rounded-md border border-line px-2.5 font-mono text-[11px] text-muted transition-colors hover:border-ink/30 hover:text-ink"
-            aria-label="Open command palette"
-          >
-            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-            <span className="hidden sm:inline">Search</span>
-            <span className="sm:hidden">Menu</span>
-            <kbd className="hidden rounded border border-line px-1 text-[10px] sm:inline">{mac ? '⌘' : 'Ctrl'} K</kbd>
-          </button>
-          <button
-            onClick={toggleTheme}
-            className="grid h-8 w-8 place-items-center rounded-md border border-line text-muted transition-colors hover:border-ink/30 hover:text-ink"
-            aria-label="Toggle dark mode"
-          >
-            <ThemeIcon />
+          <div className="flex items-center gap-1.5">
+            <nav aria-label="More sections" className="hidden items-center gap-1.5 xl:flex">
+              {secondary.map((s) => (
+                <Link key={s.id} href={href(s.id)} className="pill" aria-current={isHome && active === s.id ? 'location' : undefined}>
+                  {s.label}
+                </Link>
+              ))}
+            </nav>
+            <Link href="/resume" className="pill hidden sm:inline-flex" aria-current={pathname === '/resume' ? 'page' : undefined}>
+              Resume
+            </Link>
+            <button type="button" onClick={() => window.dispatchEvent(new Event(PALETTE_EVENT))} className="pill hidden md:inline-flex" aria-label="Open command palette">
+              ⌘K
+            </button>
+            <ThemePill className="hidden md:inline-flex" />
+            <MotionPill className="hidden md:inline-flex" />
+            <button type="button" className="pill lg:hidden" aria-expanded={open} aria-controls="site-menu" onClick={() => setOpen(true)}>
+              Menu
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div
+        id="site-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        hidden={!open}
+        className="inv site-chrome fixed inset-0 z-[70] flex flex-col overflow-y-auto px-[var(--pad)] pb-6"
+      >
+        <div className="flex h-[var(--hh)] shrink-0 items-center justify-between">
+          <Logo />
+          <button type="button" className="pill" onClick={() => setOpen(false)}>
+            Close
           </button>
         </div>
+        <nav aria-label="Menu" className="mt-6 flex flex-1 flex-col justify-center gap-1">
+          {[...sections, { id: 'resume', label: 'Resume' }].map((s, k) => (
+            <Link
+              key={s.id}
+              ref={k === 0 ? first : undefined}
+              href={s.id === 'resume' ? '/resume' : href(s.id)}
+              onClick={() => setOpen(false)}
+              className="text-[clamp(2.6rem,12vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
+            >
+              {s.label}
+              <span className="stop">.</span>
+            </Link>
+          ))}
+        </nav>
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+          <span className="label">{profile.email}</span>
+          <span className="flex gap-1.5">
+            <ThemePill />
+            <MotionPill />
+          </span>
+        </div>
       </div>
-    </header>
+    </>
   );
 }

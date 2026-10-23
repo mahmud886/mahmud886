@@ -5,58 +5,56 @@ import { profile } from '@/lib/data';
 
 export default function Contact() {
   const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(profile.email);
+  const copy = () =>
+    navigator.clipboard?.writeText(profile.email).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
-    } catch {}
-  };
+    });
+
   return (
-    <section id="contact" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-24 pt-20 sm:px-6 sm:pb-32 sm:pt-28">
-      <div data-reveal className="card ticks grid gap-10 p-6 sm:p-10 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+    <section id="contact" aria-labelledby="contact-title" className="inv px-[var(--pad)] pt-[clamp(90px,12vw,190px)]">
+      <p className="label mb-6" data-reveal>
+        <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-ink align-middle" />
+        Available for full-time roles &amp; select freelance
+      </p>
+      <h2 id="contact-title" className="text-[clamp(3.4rem,11vw,11.5rem)] font-extrabold leading-[0.84] tracking-[-0.065em]" data-reveal>
+        Let’s build
+        <br />
+        something <span className="serif-i font-normal tracking-[-0.04em]">good.</span>
+      </h2>
+
+      <div className="mt-[clamp(40px,6vw,90px)] grid gap-8 border-t border-ink pt-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div>
-          <div className="label mb-4">
-            <span className="text-accent">05</span> / Contact
-          </div>
-          <h2 className="text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
-            Have a problem <span className="font-serif font-normal italic text-accent">worth solving?</span>
-          </h2>
-          <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-2">
-            Full-time roles, contracts or a hard frontend problem — I reply within a day.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a href={`mailto:${profile.email}`} className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90">
-              Email me →
-            </a>
-            <button onClick={copy} className="inline-flex items-center gap-2 rounded-md border border-line px-5 py-3 text-sm font-medium transition-colors hover:border-ink/40">
-              {copied ? '✓ Copied' : 'Copy address'}
+          <div className="label mb-3">Write to me</div>
+          <a
+            href={`mailto:${profile.email}`}
+            data-cursor="Say hi"
+            className="block break-all text-[clamp(1.5rem,3.6vw,3.4rem)] font-bold leading-none tracking-[-0.045em] underline decoration-2 underline-offset-[0.18em] transition-opacity hover:opacity-70"
+          >
+            {profile.email}
+          </a>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button type="button" onClick={copy} className="pill">
+              {copied ? 'Copied ✓' : 'Copy email'}
             </button>
+            <a href={`tel:${profile.phone}`} className="pill">
+              {profile.phone}
+            </a>
+            <a href={profile.cv} download={`${profile.cvName}.pdf`} className="pill">
+              Download CV
+            </a>
           </div>
         </div>
-        <div className="overflow-hidden rounded-[10px] bg-[#111216] font-mono text-[12.5px] leading-relaxed text-[#d7d6d1]">
-          <div className="border-b border-white/10 px-4 py-2 text-[11px] text-white/40">~/hire.sh</div>
-          <pre className="overflow-x-auto p-4">
-            <code>
-              <span className="text-[#6b6a73]"># the fastest path to a reply</span>
-              {'\n'}
-              <span className="text-[#3ddc84]">$</span> curl -X POST https://mahmud886.vercel.app/hire \{'\n'}
-              {'    '}-d <span className="text-[#ffab7a]">&quot;from=you@company.com&quot;</span> \{'\n'}
-              {'    '}-d <span className="text-[#ffab7a]">&quot;to={profile.email}&quot;</span>
-              {'\n\n'}
-              <span className="text-[#8aa2ff]">HTTP/2 200</span>
-              {'\n'}
-              <span className="text-white/50">{`{ "status": "available", "reply_within": "24h" }`}</span>
-            </code>
-          </pre>
-          <div className="flex flex-wrap gap-4 border-t border-white/10 px-4 py-3 text-[11px]">
-            {profile.socials.map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="text-white/60 hover:text-white">
-                {s.label} ↗
+        <ul className="border-t border-line lg:border-t-0">
+          {profile.socials.map((s) => (
+            <li key={s.label} className="index-row border-b border-line">
+              <a href={s.href} target="_blank" rel="noreferrer" className="flex items-baseline justify-between gap-4 px-1 py-4">
+                <span className="text-[clamp(1.4rem,2.2vw,2rem)] font-bold tracking-[-0.04em]">{s.label}</span>
+                <span className="index-muted font-mono text-[12px] text-muted">{s.handle} ↗</span>
               </a>
-            ))}
-          </div>
-        </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

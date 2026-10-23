@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { experience, profile } from '@/lib/data';
-import { shortSha } from '@/lib/sha';
+import { experience, shortCompany } from '@/lib/data';
 
 export function generateStaticParams() {
   return experience.map((j) => ({ slug: j.slug }));
@@ -21,111 +20,106 @@ export default async function WorkPage({ params }: { params: Promise<{ slug: str
   const j = experience[index];
   const newer = experience[index - 1];
   const older = experience[index + 1];
-  const sha = shortSha(j.slug);
+  const lines = [...j.resume, ...j.responsibilities];
 
   return (
-    <main className="mx-auto max-w-4xl px-4 pb-24 pt-10 sm:px-6 sm:pt-16">
-      <nav data-reveal className="font-mono text-[12px] text-muted" aria-label="Breadcrumb">
+    <main className="px-[var(--pad)] pb-[clamp(80px,10vw,160px)] pt-[calc(var(--hh)+24px)]">
+      <nav data-reveal className="label flex gap-2" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">
-          ~
+          Home
         </Link>
-        {' / '}
+        /
         <Link href="/#experience" className="hover:text-ink">
-          experience
+          Experience
         </Link>
-        {' / '}
-        <span className="text-ink">{j.slug}</span>
+        /<span className="text-ink">{shortCompany(j.company)}</span>
       </nav>
 
-      <div data-reveal className="mt-6 font-mono text-[12px] text-muted">
-        <span className="text-ok">$</span> git show {sha}
-      </div>
+      <header className="mt-[clamp(28px,4vw,60px)]">
+        <p data-reveal className="label flex items-center gap-3">
+          <span>{j.period}</span>
+          {j.current && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-current px-2 py-0.5 text-ink">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" /> Now
+            </span>
+          )}
+        </p>
+        <h1 data-reveal style={{ ['--i' as string]: 1 }} className="mt-3 text-[clamp(3rem,9vw,9rem)] font-extrabold leading-[0.84] tracking-[-0.065em]">
+          {shortCompany(j.company)}
+          <span className="stop">.</span>
+        </h1>
+        <p data-reveal style={{ ['--i' as string]: 2 }} className="serif-i mt-6 text-[clamp(1.5rem,3vw,2.6rem)] leading-none">
+          {j.role} <span className="not-italic text-muted">at {j.company}</span>
+        </p>
+      </header>
 
-      <div data-reveal className="card ticks mt-3 overflow-hidden">
-        <div className="space-y-1 border-b border-line bg-paper-2 px-5 py-4 font-mono text-[12.5px]">
-          <div>
-            <span className="text-[#b58900] dark:text-[#e5c07b]">commit {sha}</span>
-            {j.current && (
-              <span className="text-muted">
-                {' '}
-                (<span className="text-link">HEAD</span> → <span className="text-ok">main</span>)
-              </span>
-            )}
-          </div>
-          <div className="text-ink-2">
-            Author: {profile.name} &lt;{profile.email}&gt;
-          </div>
-          <div className="text-ink-2">Date:&nbsp;&nbsp; {j.period}</div>
-        </div>
-
-        <div className="px-5 py-8 sm:px-8">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
-            {j.role} <span className="text-muted">@</span> {j.company}
-          </h1>
-          <p className="mt-4 font-serif text-2xl leading-snug text-ink-2">{j.summary}</p>
+      <div className="mt-[clamp(32px,4vw,64px)] grid gap-10 border-t border-ink pt-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-16">
+        <div data-reveal>
+          <p className="text-[clamp(1.25rem,2vw,1.85rem)] font-medium leading-[1.25] tracking-[-0.02em]">{j.summary}</p>
           {j.companyUrl && (
-            <a href={j.companyUrl} target="_blank" rel="noreferrer" className="mt-4 inline-block font-mono text-[12px] text-link hover:underline">
-              {j.companyUrl.replace('https://', '')} ↗
+            <a href={j.companyUrl} target="_blank" rel="noreferrer" className="pill mt-6">
+              {j.companyUrl.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, '')} ↗
             </a>
           )}
         </div>
-
-        <div className="border-t border-line">
-          <div className="flex justify-between bg-paper-2 px-5 py-2 font-mono text-[11px] text-muted">
-            <span>responsibilities.md</span>
-            <span>
-              <span className="text-ok">+{j.responsibilities.length + j.resume.length}</span> <span className="text-accent">-0</span>
-            </span>
+        <div data-reveal style={{ ['--i' as string]: 1 }} className="space-y-8">
+          <div>
+            <div className="label mb-3">Highlights</div>
+            <ul className="space-y-2">
+              {j.highlights.map((h) => (
+                <li key={h} className="flex gap-3 text-[15px] leading-relaxed">
+                  <span className="mt-[11px] h-px w-4 shrink-0 bg-ink" />
+                  {h}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="py-2 font-mono text-[13px] leading-relaxed">
-            {[...j.resume, ...j.responsibilities].map((r, i) => (
-              <li key={`${i}-${r}`} className="grid grid-cols-[36px_16px_1fr] gap-1 px-3 py-1 hover:bg-ok/5 sm:px-5">
-                <span className="select-none text-right text-muted/60">{i + 1}</span>
-                <span className="select-none text-ok">+</span>
-                <span className="text-ink-2">{r}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <div className="mt-10 grid gap-8 sm:grid-cols-2">
-        <div data-reveal>
-          <div className="label mb-3">Highlights</div>
-          <ul className="space-y-2">
-            {j.highlights.map((h) => (
-              <li key={h} className="flex gap-3 text-[15px] leading-relaxed text-ink-2">
-                <span className="mt-[10px] h-px w-3 shrink-0 bg-accent" />
-                {h}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div data-reveal>
-          <div className="label mb-3">Tools</div>
-          <div className="flex flex-wrap gap-1.5">
-            {j.tech.map((t) => (
-              <span key={t} className="rounded border border-line px-2 py-1 font-mono text-[12px]">
-                {t}
-              </span>
-            ))}
+          <div>
+            <div className="label mb-3">Tools</div>
+            <div className="flex flex-wrap gap-1.5">
+              {j.tech.map((t) => (
+                <span key={t} className="pill cursor-default">
+                  {t}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div data-reveal className="mt-16 grid gap-3 border-t border-line pt-6 font-mono text-[12.5px] sm:grid-cols-2">
+      <section data-reveal aria-labelledby="did-title" className="mx-auto mt-[clamp(64px,8vw,130px)] max-w-6xl">
+        <div className="flex items-baseline justify-between border-b border-ink pb-3">
+          <h2 id="did-title" className="text-[1.35rem] font-bold tracking-[-0.03em]">
+            What I did
+          </h2>
+          <span className="label">{String(lines.length).padStart(2, '0')} lines</span>
+        </div>
+        <ol>
+          {lines.map((r, i) => (
+            <li key={`${i}-${r}`} className="grid grid-cols-[48px_1fr] gap-3 border-b border-line py-4 text-[16px] leading-relaxed">
+              <span className="pt-1 font-mono text-[11px] text-muted">{String(i + 1).padStart(2, '0')}</span>
+              {r}
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <div data-reveal className="mt-[clamp(64px,8vw,130px)] grid border-y border-ink md:grid-cols-2">
         {newer ? (
-          <Link href={`/work/${newer.slug}`} className="group rounded-md border border-line p-4 hover:border-ink/30">
-            <div className="text-muted">← newer</div>
-            <div className="mt-1 text-ink group-hover:text-accent">{newer.company}</div>
+          <Link href={`/work/${newer.slug}`} className="index-row block px-1 py-6 md:border-r md:border-line">
+            <span className="index-muted label">← Newer</span>
+            <span className="mt-2 block text-[clamp(1.8rem,4vw,3.4rem)] font-extrabold leading-none tracking-[-0.05em]">{shortCompany(newer.company)}</span>
           </Link>
         ) : (
-          <span />
+          <Link href="/#experience" className="index-row block px-1 py-6 md:border-r md:border-line">
+            <span className="index-muted label">← Back</span>
+            <span className="mt-2 block text-[clamp(1.8rem,4vw,3.4rem)] font-extrabold leading-none tracking-[-0.05em]">All experience</span>
+          </Link>
         )}
         {older && (
-          <Link href={`/work/${older.slug}`} className="group rounded-md border border-line p-4 text-right hover:border-ink/30">
-            <div className="text-muted">older →</div>
-            <div className="mt-1 text-ink group-hover:text-accent">{older.company}</div>
+          <Link href={`/work/${older.slug}`} className="index-row block border-t border-line px-1 py-6 text-right md:border-t-0">
+            <span className="index-muted label">Older →</span>
+            <span className="mt-2 block text-[clamp(1.8rem,4vw,3.4rem)] font-extrabold leading-none tracking-[-0.05em]">{shortCompany(older.company)}</span>
           </Link>
         )}
       </div>

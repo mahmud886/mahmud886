@@ -237,6 +237,7 @@ export const projects = [
     link: 'https://dev-visualize.vercel.app/',
     images: ['/images/projects/dev-visualize/1.png', '/images/projects/dev-visualize/2.png', '/images/projects/dev-visualize/3.png'],
     accent: '#7c5cff',
+    stat: { value: '75', label: 'interactive sections' },
   },
   {
     slug: 'sporefall',
@@ -262,6 +263,7 @@ export const projects = [
     link: 'https://www.sporefall.com/',
     images: ['/images/projects/sporefall/1.png', '/images/projects/sporefall/2.png', '/images/projects/sporefall/3.png'],
     accent: '#00e5a8',
+    stat: { value: '3', label: 'products, one platform' },
   },
   {
     slug: 'loud-spectrum',
@@ -286,6 +288,7 @@ export const projects = [
     link: 'https://loudspectrum.com/en',
     images: ['/images/projects/loud-spectrum/1.png', '/images/projects/loud-spectrum/2.png', '/images/projects/loud-spectrum/3.png'],
     accent: '#ff5c8a',
+    stat: { value: '<1s', label: 'largest contentful paint' },
   },
 ];
 
@@ -321,4 +324,7 @@ export const moreProjects = [
 ];
 
 export type Project = (typeof projects)[number];
+
+/** Company name without the legal suffix, for big display type. */
+export const shortCompany = (company: string) => company.replace(/ (Pvt\. )?Ltd\.?$| Limited$/, '');
 export type Job = (typeof experience)[number];
