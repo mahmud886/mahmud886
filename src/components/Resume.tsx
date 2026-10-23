@@ -2,7 +2,12 @@
 
 import { useEffect, useRef } from 'react';
 import { gsap, useGSAP } from '@/lib/gsap';
-import { experience, moreProjects, profile, projects } from '@/lib/data';
+import { building, caseStudies, experience, profile } from '@/lib/data';
+
+// The resume details five products and lists the rest in one line each.
+const DETAILED = ['parts-pilot', 'restaurant-os', 'purecart', 'sporefall', 'loud-spectrum'];
+const detailed = DETAILED.map((slug) => caseStudies.find((p) => p.slug === slug)!);
+const brief = [...caseStudies.filter((p) => !DETAILED.includes(p.slug)), ...building];
 
 // Classic single-column layout modelled on the PDF resume: easy for humans and ATS parsers alike.
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -155,15 +160,17 @@ export default function Resume() {
 
             <Section title="Selected Projects">
               <div className="space-y-5">
-                {projects.map((p) => (
+                {detailed.map((p) => (
                   <div key={p.slug} className="resume-avoid-break">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="text-[14px] font-semibold">
                           {p.title}{' '}
-                          <a href={p.link} target="_blank" rel="noreferrer" className="text-[12px] font-normal text-[#0e8fa0] underline underline-offset-2">
-                            {url(p.link).replace(/\/$/, '')}
-                          </a>
+                          {p.link && (
+                            <a href={p.link} target="_blank" rel="noreferrer" className="text-[12px] font-normal text-[#0e8fa0] underline underline-offset-2">
+                              {url(p.link).replace(/\/$/, '')}
+                            </a>
+                          )}
                         </div>
                         <div className="text-[13px] text-[#3b3b46]">
                           {p.kind} · {p.association}
@@ -178,7 +185,7 @@ export default function Resume() {
                   </div>
                 ))}
                 <div className="resume-avoid-break grid gap-3 sm:grid-cols-2">
-                  {moreProjects.map((p) => (
+                  {brief.map((p) => (
                     <div key={p.title} className="text-[13px] leading-relaxed text-[#3b3b46]">
                       <span className="font-semibold text-[#1a1a22]">{p.title}</span> — {p.kind}. {p.description}
                     </div>

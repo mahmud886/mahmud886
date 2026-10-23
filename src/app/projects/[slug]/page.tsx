@@ -1,21 +1,22 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { projects } from '@/lib/data';
-import BrowserFrame from '@/components/BrowserFrame';
+import { caseStudies } from '@/lib/data';
+import ScreenGallery from '@/components/ScreenGallery';
 
 export function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }));
+  return caseStudies.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const p = projects.find((x) => x.slug === slug);
+  const p = caseStudies.find((x) => x.slug === slug);
   if (!p) return {};
   return {
     title: `${p.title} — Case study`,
     description: p.overview,
-    openGraph: { title: `${p.title} — Case study`, description: p.overview, images: [{ url: p.images[0], alt: p.title }] },
+    openGraph: { title: `${p.title} — Case study`, description: p.overview, images: [{ url: p.screens[0].src, alt: p.title }] },
   };
 }
 
@@ -33,10 +34,10 @@ function Chapter({ id, n, title, children }: { id: string; n: number; title: str
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const index = projects.findIndex((p) => p.slug === slug);
+  const index = caseStudies.findIndex((p) => p.slug === slug);
   if (index === -1) notFound();
-  const p = projects[index];
-  const next = projects[(index + 1) % projects.length];
+  const p = caseStudies[index];
+  const next = caseStudies[(index + 1) % caseStudies.length];
   const meta = [
     { k: 'Status', v: p.status },
     { k: 'Timeline', v: p.period },
@@ -46,27 +47,30 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="px-[var(--pad)] pb-[clamp(80px,10vw,160px)] pt-[calc(var(--hh)+24px)]">
-      <nav data-reveal className="label flex gap-2" aria-label="Breadcrumb">
+      <nav data-reveal className="label flex flex-wrap gap-2" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-ink">
           Home
         </Link>
         /
-        <Link href="/#work" className="hover:text-ink">
-          Work
+        <Link href="/#products" className="hover:text-ink">
+          Projects
         </Link>
         /<span className="text-ink">{p.title}</span>
       </nav>
 
       <header className="mt-[clamp(28px,4vw,60px)]">
-        <p data-reveal className="label">
-          Case {String(index + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
+        <p data-reveal className="label flex flex-wrap items-center gap-3">
+          <span className="text-ink">
+            Case {String(index + 1).padStart(2, '0')} / {String(caseStudies.length).padStart(2, '0')}
+          </span>
+          <span>{p.kind}</span>
         </p>
-        <h1 data-reveal style={{ ['--i' as string]: 1 }} className="mt-3 text-[clamp(3.6rem,13vw,13rem)] font-extrabold leading-[0.82] tracking-[-0.07em]">
+        <h1 data-reveal style={{ ['--i' as string]: 1 }} className="mt-3 text-[clamp(3.4rem,13vw,13rem)] font-extrabold leading-[0.82] tracking-[-0.07em]">
           {p.title}
           <span className="stop">.</span>
         </h1>
-        <p data-reveal style={{ ['--i' as string]: 2 }} className="serif-i mt-[clamp(16px,2vw,32px)] text-[clamp(1.5rem,3vw,2.6rem)] leading-none">
-          {p.kind}
+        <p data-reveal style={{ ['--i' as string]: 2 }} className="serif-i mt-[clamp(16px,2vw,32px)] max-w-[30ch] text-[clamp(1.5rem,3vw,2.6rem)] leading-[1.08]">
+          {p.tagline}
         </p>
 
         <div className="mt-[clamp(32px,4vw,64px)] grid gap-10 border-t border-ink pt-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-16">
@@ -81,27 +85,41 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   <dd>{m.v}</dd>
                 </div>
               ))}
-              <div className="grid grid-cols-[110px_1fr] gap-4 py-2.5">
-                <dt className="label pt-0.5">Headline</dt>
-                <dd>
-                  <b className="font-bold">{p.stat.value}</b> {p.stat.label}
-                </dd>
-              </div>
             </dl>
-            <a href={p.link} target="_blank" rel="noreferrer" className="pill-solid mt-6">
-              Visit live site ↗
-            </a>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {p.link && (
+                <a href={p.link} target="_blank" rel="noreferrer" className="pill-solid">
+                  Open live ↗
+                </a>
+              )}
+              <a href="#screens" className="pill h-12 px-6">
+                All {p.screens.length} screens ↓
+              </a>
+            </div>
           </div>
         </div>
+
+        <dl data-reveal className="mt-[clamp(32px,4vw,64px)] grid grid-cols-3 border-y border-ink">
+          {p.metrics.map((m, i) => (
+            <div key={m.label} className={`py-5 ${i ? 'border-l border-line pl-4' : 'pr-4'}`}>
+              <dd className="text-[clamp(2.2rem,6vw,5.5rem)] font-extrabold leading-[0.85] tracking-[-0.06em] tabular-nums">{m.value}</dd>
+              <dt className="label mt-2">{m.label}</dt>
+            </div>
+          ))}
+        </dl>
       </header>
 
       <div data-reveal className="mt-[clamp(40px,6vw,96px)]">
-        <BrowserFrame src={p.images[0]} url={p.link} alt={`${p.title} home screen`} priority sizes="100vw" />
+        <ScreenGallery screens={p.screens} url={p.link} title={p.title} priority />
       </div>
 
       <article className="mx-auto mt-[clamp(64px,8vw,140px)] max-w-6xl space-y-[clamp(56px,7vw,110px)]">
-        <Chapter id="context" n={1} title="Context">
-          <p className="text-[clamp(1.2rem,1.8vw,1.6rem)] leading-snug tracking-[-0.015em]">{p.description}</p>
+        <Chapter id="problem" n={1} title="The problem">
+          <p className="text-[clamp(1.2rem,1.8vw,1.6rem)] leading-snug tracking-[-0.015em]">{p.problem}</p>
+          <p className="mt-6 text-[16px] leading-relaxed text-ink-2">
+            <span className="label mr-2 !text-ink">My role</span>
+            {p.role}
+          </p>
         </Chapter>
 
         <Chapter id="built" n={2} title="What I built">
@@ -127,12 +145,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         <Chapter id="milestones" n={4} title="Milestones">
           <ul className="space-y-2.5 text-[16px]">
-            {p.milestones.map((m) => (
-              <li key={m} className="flex items-center gap-3">
-                <span className="grid h-5 w-5 place-items-center rounded-full bg-ink text-[10px] text-paper">✓</span>
-                {m}
-              </li>
-            ))}
+            {p.milestones.map((m, i) => {
+              const done = i < Math.round((p.progress / 100) * p.milestones.length);
+              return (
+                <li key={m} className="flex items-center gap-3">
+                  <span className={`grid h-5 w-5 place-items-center rounded-full text-[10px] ${done ? 'bg-ink text-paper' : 'border border-line text-muted'}`}>
+                    {done ? '✓' : ''}
+                  </span>
+                  <span className={done ? '' : 'text-muted'}>{m}</span>
+                </li>
+              );
+            })}
           </ul>
           <div className="mt-8">
             <div className="label mb-2 flex justify-between">
@@ -144,18 +167,32 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         </Chapter>
-
-        <Chapter id="gallery" n={5} title="Gallery">
-          <div className="space-y-6">
-            {p.images.slice(1).map((src, i) => (
-              <BrowserFrame key={src} src={src} url={p.link} alt={`${p.title} screen ${i + 2}`} sizes="(min-width: 1024px) 860px, 100vw" />
-            ))}
-          </div>
-        </Chapter>
       </article>
 
+      <section id="screens" aria-labelledby="screens-title" className="mt-[clamp(80px,10vw,160px)] scroll-mt-24">
+        <div className="flex items-baseline justify-between border-b border-ink pb-3">
+          <h2 id="screens-title" className="text-[clamp(2rem,4vw,3.4rem)] font-extrabold tracking-[-0.05em]">
+            Every screen<span className="stop">.</span>
+          </h2>
+          <span className="label">{String(p.screens.length).padStart(2, '0')} screens</span>
+        </div>
+        <div className="mt-8 grid gap-x-6 gap-y-10 md:grid-cols-2">
+          {p.screens.map((s, i) => (
+            <figure key={s.src} data-reveal style={{ ['--i' as string]: i % 2 }} className={i === 0 && p.screens.length % 2 ? 'md:col-span-2' : ''}>
+              <div className="relative aspect-[16/10] overflow-hidden rounded-[clamp(12px,1.4vw,20px)] border border-line bg-paper-2">
+                <Image src={s.src} alt={`${p.title} — ${s.label}`} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover object-top" />
+              </div>
+              <figcaption className="mt-3 flex gap-3 text-[14px]">
+                <span className="font-mono text-[11px] leading-[1.6] text-muted">{String(i + 1).padStart(2, '0')}</span>
+                {s.label}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
       <Link href={`/projects/${next.slug}`} data-reveal data-cursor="Next case" className="index-row mt-[clamp(80px,10vw,160px)] block border-y border-ink px-1 py-6">
-        <span className="index-muted label">Next case study</span>
+        <span className="index-muted label">Next case study · {next.kind}</span>
         <span className="mt-2 flex items-end justify-between gap-6">
           <span className="text-[clamp(3rem,10vw,9rem)] font-extrabold leading-[0.85] tracking-[-0.07em]">{next.title}</span>
           <span aria-hidden className="mb-2 text-[clamp(2rem,4vw,3.5rem)]">

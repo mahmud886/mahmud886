@@ -8,6 +8,7 @@ import { useMotion } from '@/lib/motion';
 import { PALETTE_EVENT, sections, THEME_EVENT, toggleTheme } from '@/lib/nav';
 
 const TICKER = [
+  'Building 4 SaaS products in 2026',
   'Open to new roles & freelance work',
   'React · Next.js · TypeScript · GSAP',
   'Based in Dhaka, shipping worldwide',
@@ -119,8 +120,10 @@ export default function Header() {
   }, [open]);
 
   const href = (id: string) => (isHome ? `#${id}` : `/#${id}`);
-  const primary = sections.slice(0, 3);
-  const secondary = sections.slice(3);
+  // The header carries the main chapters; the full list lives in the menu, footer and ⌘K.
+  const pick = (ids: string[]) => sections.filter((s) => ids.includes(s.id));
+  const primary = pick(['products', 'work', 'lab']);
+  const secondary = pick(['experience', 'writing', 'contact']);
 
   return (
     <>

@@ -287,6 +287,12 @@ body::after {
   }
 }
 
+@keyframes gallery-progress {
+  from {
+    transform: scaleX(0);
+  }
+}
+
 /* Header ticker: one line at a time, crossfading upward. */
 .ticker {
   display: grid;

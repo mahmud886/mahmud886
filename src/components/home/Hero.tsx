@@ -79,7 +79,7 @@ function Greeting() {
   );
 }
 
-const META = ['Software Engineer', 'Dhaka / Remote', `${profile.years}+ years · Frontend`, 'Available for work'];
+const META = ['Software Engineer', 'Builds SaaS · Dhaka', `${profile.years}+ years shipping`, 'Available for work'];
 
 export default function Hero() {
   return (
@@ -107,8 +107,8 @@ export default function Hero() {
             I’m <b className="font-semibold text-ink">{profile.firstName}</b> — {profile.intro}
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link href="#work" className="pill-solid">
-              See the work ↓
+            <Link href="#products" className="pill-solid">
+              See my products ↓
             </Link>
             <a href={profile.cv} download={`${profile.cvName}.pdf`} className="pill h-12 px-6">
               Download CV

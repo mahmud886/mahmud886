@@ -1,5 +1,7 @@
 export const sections = [
+  { id: 'products', label: 'SaaS' },
   { id: 'work', label: 'Work' },
+  { id: 'lab', label: 'Lab' },
   { id: 'services', label: 'Services' },
   { id: 'experience', label: 'Experience' },
   { id: 'stack', label: 'Stack' },

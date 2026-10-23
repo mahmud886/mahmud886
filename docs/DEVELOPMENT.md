@@ -15,7 +15,10 @@ npm run dev
 
 ## Content
 
-Everything on the site — profile, experience, projects, resume — lives in `src/lib/data.ts`.
+Everything on the site — profile, experience, projects, resume — lives in `src/lib/data.ts`:
+`saas` (the four featured products), `projects` (client work), `lab` (side products with screens) and
+`building` (smaller work in progress). Each case study's screens live in `public/images/projects/<slug>/N.webp`
+and are labelled in `data.ts` with `shots(slug, labels)`.
 
 ## Motion
 

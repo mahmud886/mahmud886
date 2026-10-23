@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { experience, profile, projects } from '@/lib/data';
+import { caseStudies, experience, profile } from '@/lib/data';
 import { fetchMediumPosts } from '@/lib/medium';
 
 export const revalidate = 3600;
@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     page('', 1),
     page('/resume', 0.9),
-    ...projects.map((p) => page(`/projects/${p.slug}`, 0.8)),
+    ...caseStudies.map((p) => page(`/projects/${p.slug}`, 0.8)),
     ...experience.map((j) => page(`/work/${j.slug}`, 0.6)),
     ...posts.map((p) => page(`/blog/${p.slug}`, 0.5)),
   ];

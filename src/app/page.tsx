@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
 import Hero from '@/components/home/Hero';
+import Products from '@/components/home/Products';
+import Lab from '@/components/home/Lab';
 import Halftone from '@/components/home/Halftone';
 import Statement from '@/components/home/Statement';
 import WorkReel from '@/components/home/WorkReel';
@@ -18,9 +20,11 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      <Products />
       <Halftone caption={`${profile.years}+ years of interfaces that move. Point at the dots.`} />
       <Statement />
       <WorkReel />
+      <Lab />
       <Services />
       <Process />
       <Experience />

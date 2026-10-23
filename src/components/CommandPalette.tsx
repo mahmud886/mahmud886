@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { experience, profile, projects } from '@/lib/data';
+import { caseStudies, experience, profile } from '@/lib/data';
 import { PALETTE_EVENT, sections, toggleTheme } from '@/lib/nav';
 
 type Item = { group: string; label: string; hint?: string; run: () => void };
@@ -27,7 +27,7 @@ export default function CommandPalette() {
     return [
       ...sections.map((s) => ({ group: 'Go to', label: s.label, hint: `#${s.id}`, run: go(`/#${s.id}`) })),
       { group: 'Go to', label: 'Resume', hint: '/resume', run: go('/resume') },
-      ...projects.map((p) => ({ group: 'Projects', label: p.title, hint: p.kind, run: go(`/projects/${p.slug}`) })),
+      ...caseStudies.map((p) => ({ group: 'Projects', label: p.title, hint: p.kind, run: go(`/projects/${p.slug}`) })),
       ...experience.map((j) => ({ group: 'Experience', label: j.company, hint: j.role, run: go(`/work/${j.slug}`) })),
       { group: 'Actions', label: 'Toggle dark mode', hint: 'theme', run: toggleTheme },
       {

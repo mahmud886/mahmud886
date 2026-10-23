@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap';
-import { moreProjects, profile, projects } from '@/lib/data';
+import { profile, projects } from '@/lib/data';
 
 /**
  * "Selected work." On wide screens with motion allowed the section pins and vertical
@@ -54,7 +54,6 @@ export default function WorkReel() {
   const github = profile.socials.find((s) => s.label === 'GitHub')!.href;
 
   return (
-    <>
       <section
         ref={section}
         id="work"
@@ -63,10 +62,10 @@ export default function WorkReel() {
       >
         <div className="mb-[clamp(24px,3vw,44px)] flex flex-wrap items-end justify-between gap-x-8 gap-y-4 px-[var(--pad)]">
           <h2 id="work-title" className="chapter">
-            Selected work<span className="stop">.</span>
+            Client work<span className="stop">.</span>
           </h2>
           <div className="max-w-[34ch] text-[15px] leading-snug text-ink-2">
-            {projects.length} products in production — each with a number someone cared about.
+            Client and team work in production — each with a number someone cared about.
             <div className="mt-3 flex items-center gap-3">
               <span className="label">{native ? 'Swipe →' : 'Scroll →'}</span>
               <span className="relative h-px flex-1 bg-line">
@@ -91,7 +90,7 @@ export default function WorkReel() {
             >
               <div className="relative aspect-[16/10] overflow-hidden rounded-[clamp(14px,1.6vw,22px)] bg-paper-2">
                 <Image
-                  src={p.images[0]}
+                  src={p.screens[0].src}
                   alt={`${p.title} — ${p.kind}`}
                   fill
                   sizes="(min-width: 900px) 56vw, 85vw"
@@ -130,30 +129,5 @@ export default function WorkReel() {
           </a>
         </div>
       </section>
-
-      <section aria-labelledby="also-title" className="px-[var(--pad)] pb-[clamp(80px,10vw,160px)] pt-[clamp(40px,5vw,80px)]">
-        <div className="flex items-baseline justify-between border-b border-ink pb-3">
-          <h3 id="also-title" className="label !text-ink">
-            Also built
-          </h3>
-          <span className="label">{String(moreProjects.length).padStart(2, '0')} projects</span>
-        </div>
-        <ul>
-          {moreProjects.map((p, i) => (
-            <li key={p.title} className="index-row border-b border-line" data-reveal style={{ ['--i' as string]: i }}>
-              <div className="grid gap-x-6 gap-y-2 px-1 py-5 md:grid-cols-[48px_minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,0.9fr)] md:items-baseline">
-                <span className="index-muted font-mono text-[11px] text-muted">{String(i + 1).padStart(2, '0')}</span>
-                <span className="text-[clamp(1.6rem,3.2vw,3rem)] font-bold leading-none tracking-[-0.045em]">
-                  {p.title}
-                  <span className="serif-i index-muted ml-3 align-middle text-[0.45em] font-normal tracking-normal text-muted">{p.kind}</span>
-                </span>
-                <span className="index-muted text-[14.5px] leading-relaxed text-ink-2">{p.description}</span>
-                <span className="index-muted font-mono text-[11px] leading-relaxed text-muted md:text-right">{p.stack.join(' · ')}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </>
   );
 }
