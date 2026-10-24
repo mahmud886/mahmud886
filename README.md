@@ -187,8 +187,7 @@ const iqbal = {
 - [10 JavaScript Coding Interview Questions Solve With Code](https://medium.com/swlh/10-javascript-coding-interview-questions-solve-with-code-3d0a22393a69?source=rss-8e6ba8805fe7------2) <sub>· May 2020</sub>
 - [10 Days of JavaScript HackerRank Problem Solve](https://medium.com/@mahmud886/10-days-of-javascript-hackerrank-problem-solve-d5520b858c9d?source=rss-8e6ba8805fe7------2) <sub>· May 2020</sub>
 - [REACT INTERVIEW QUESTIONS.](https://medium.com/@mahmud886/react-interview-questions-9ecc07d3a5ec?source=rss-8e6ba8805fe7------2) <sub>· May 2020</sub>
-- [10 JAVASCRIPT INTERVIEW QUESTIONS](https://medium.com/@mahmud886/10-javascript-interview-questions-ee31a3c1a742?source=rss-8e6ba8805fe7------2) <sub>· May 2020</sub>
-<!-- BLOG-POST-LIST:END -->
+- [10 JAVASCRIPT INTERVIEW QUESTIONS](https://medium.com/@mahmud886/10-javascript-interview-questions-ee31a3c1a742?source=rss-8e6ba8805fe7------2) <sub>· May 2020</sub><!-- BLOG-POST-LIST:END -->
 
 ## 🤝 Let's build something good
 
