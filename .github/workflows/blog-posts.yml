@@ -18,6 +18,8 @@ jobs:
         with:
           feed_list: https://medium.com/feed/@mahmud886
           max_post_count: 5
-          template: '- [$title]($url) <sub>· $date</sub>$newline'
+          # Each item starts on its own line, so the first never sits on the START comment's line
+          # (GitHub would then print it as raw text).
+          template: '$newline- [$title]($url) <sub>· $date</sub>'
           date_format: 'mmm yyyy'
           commit_message: 'docs(readme): refresh latest Medium posts'
