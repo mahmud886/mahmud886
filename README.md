@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  Software engineer in Dhaka with <b>7+ years</b> of React, Next.js and TypeScript — from a UI used by <b>2M+ people a day</b><br />
+  Software engineer in Dhaka with <b>7+ years</b> of React, Next.js and TypeScript — from a UI used by <b>2M+ people a day</b>
   to <b>SaaS products I design and build end to end</b>: multi-tenant under the hood, beautifully animated on the surface.
 </p>
 
